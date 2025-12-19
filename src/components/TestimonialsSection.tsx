@@ -1,15 +1,18 @@
 import TestimonialCard from './TestimonialCard';
 import { testimonials } from '@/data/products';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const TestimonialsSection = () => {
+  const { t } = useLanguage();
+
   return (
     <section id="testimonials" className="section-padding bg-background">
       <div className="container-custom">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <span className="label-subtle mb-3 block">Real Results</span>
+          <span className="label-subtle mb-3 block">{t('Real Results', 'نتائج حقيقية')}</span>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-            Loved by Thousands
+            {t('Loved by Thousands', 'محبوبة من الآلاف')}
           </h2>
         </div>
 

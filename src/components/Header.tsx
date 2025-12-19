@@ -1,8 +1,14 @@
 import { ShoppingBag, Menu, X, Globe } from 'lucide-react';
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'ar' ? 'en' : 'ar');
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
@@ -18,29 +24,32 @@ const Header = () => {
           </button>
 
           {/* Logo */}
-          <a href="/" className="font-display text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
-            Lumière
+          <a href="/" className="font-display text-xl md:text-2xl font-semibold tracking-tight text-foreground">
+            BV-Cosmatics
           </a>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             <a href="#products" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Products
+              {t('Products', 'المنتجات')}
             </a>
             <a href="#bundles" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Sets
+              {t('Sets', 'المجموعات')}
             </a>
             <a href="#testimonials" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Reviews
+              {t('Reviews', 'التقييمات')}
             </a>
           </nav>
 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
             {/* Language Switcher */}
-            <button className="flex items-center gap-1.5 p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <button 
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 p-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
               <Globe size={18} />
-              <span className="hidden sm:inline text-sm font-medium">EN</span>
+              <span className="hidden sm:inline text-sm font-medium">{language === 'ar' ? 'EN' : 'عربي'}</span>
             </button>
 
             {/* Cart */}
@@ -62,21 +71,21 @@ const Header = () => {
                 className="font-body text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Products
+                {t('Products', 'المنتجات')}
               </a>
               <a 
                 href="#bundles" 
                 className="font-body text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Sets
+                {t('Sets', 'المجموعات')}
               </a>
               <a 
                 href="#testimonials" 
                 className="font-body text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Reviews
+                {t('Reviews', 'التقييمات')}
               </a>
             </div>
           </nav>

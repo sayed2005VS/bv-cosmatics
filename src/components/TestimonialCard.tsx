@@ -1,22 +1,23 @@
 import { Star } from 'lucide-react';
 import type { Testimonial } from '@/data/products';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
 }
 
 const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
+  const { language, t } = useLanguage();
+
   return (
     <div className="bg-card rounded-3xl overflow-hidden shadow-card transition-all duration-300 hover:shadow-elevated hover:-translate-y-1">
       {/* Customer Image with Product */}
       <div className="relative aspect-[4/3] bg-secondary overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center p-8">
-          <img 
-            src={testimonial.productImage} 
-            alt={testimonial.productName}
-            className="w-full h-full object-contain"
-          />
-        </div>
+        <img 
+          src={testimonial.customerImage} 
+          alt={testimonial.customerName}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Content */}
@@ -34,7 +35,7 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
 
         {/* Review */}
         <p className="font-body text-foreground mb-4 leading-relaxed">
-          "{testimonial.review}"
+          "{language === 'ar' ? testimonial.reviewAr : testimonial.review}"
         </p>
 
         {/* Customer Name */}
@@ -46,16 +47,18 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div>
             <p className="font-body font-medium text-foreground text-sm">
-              {testimonial.productName}
+              {language === 'ar' ? testimonial.productNameAr : testimonial.productName}
             </p>
             <p className="text-xs text-muted-foreground capitalize">
-              {testimonial.productType === 'bundle' ? 'Complete Set' : 'Single Product'}
+              {testimonial.productType === 'bundle' 
+                ? t('Complete Set', 'مجموعة كاملة') 
+                : t('Single Product', 'منتج فردي')}
             </p>
           </div>
           
           {/* CTA */}
           <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground">
-            Shop
+            {t('Shop', 'تسوق')}
           </button>
         </div>
       </div>
