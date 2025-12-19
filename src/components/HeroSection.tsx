@@ -49,26 +49,6 @@ const HeroSection = () => {
               alt="BV-Cosmatics Premium Skincare Collection" 
               className="absolute inset-0 w-full h-full object-cover"
             />
-            
-            {/* Overlay Content */}
-            <div className="absolute inset-0 bg-gradient-to-r from-charcoal/40 via-transparent to-transparent flex items-center">
-              <div className="container-custom">
-                <div className="max-w-md text-start ps-4 md:ps-8">
-                  <span 
-                    key={currentSlide}
-                    className="inline-block text-xs uppercase tracking-[0.2em] text-background/80 font-medium mb-3 animate-fade-up"
-                  >
-                    {t(heroSlides[currentSlide].label, heroSlides[currentSlide].labelAr)}
-                  </span>
-                  <h1 className="font-display text-2xl md:text-4xl lg:text-5xl font-medium text-background mb-4 leading-tight">
-                    {t('Luxury Skincare', 'العناية الفاخرة بالبشرة')}
-                  </h1>
-                  <button className="bg-background text-foreground px-6 py-2.5 md:px-8 md:py-3 rounded-full font-medium text-sm md:text-base hover:bg-background/90 transition-colors shadow-soft">
-                    {t('Shop Now', 'تسوقي الآن')}
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Dots Indicator */}
