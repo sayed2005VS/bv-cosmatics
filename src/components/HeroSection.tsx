@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import heroProducts from '@/assets/hero-products.png';
+import heroBanner from '@/assets/hero-banner.png';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { heroSlides } from '@/data/products';
 
@@ -24,68 +24,67 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative hero-gradient overflow-hidden pt-20 pb-8 md:pt-24 md:pb-12">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-primary/3 rounded-full blur-3xl" />
-      </div>
-
-      <div className="container-custom relative z-10">
-        <div className="flex flex-col items-center text-center">
-          {/* Subtle label */}
-          <span 
-            key={currentSlide}
-            className="label-subtle mb-4 animate-fade-up"
+    <section className="relative pt-20 md:pt-24">
+      <div className="container-custom relative">
+        {/* Hero Banner - Wide Rectangle */}
+        <div className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-elevated">
+          {/* Navigation Arrows */}
+          <button 
+            onClick={isRTL ? nextSlide : prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-background/80 backdrop-blur-sm rounded-full shadow-soft flex items-center justify-center text-foreground hover:bg-background transition-colors"
           >
-            {t(heroSlides[currentSlide].label, heroSlides[currentSlide].labelAr)}
-          </span>
+            <ChevronLeft size={20} />
+          </button>
+          <button 
+            onClick={isRTL ? prevSlide : nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-background/80 backdrop-blur-sm rounded-full shadow-soft flex items-center justify-center text-foreground hover:bg-background transition-colors"
+          >
+            <ChevronRight size={20} />
+          </button>
 
-          {/* Product Display - Slider */}
-          <div className="relative w-full max-w-lg mb-6">
-            {/* Navigation Arrows */}
-            <button 
-              onClick={isRTL ? nextSlide : prevSlide}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-background/80 backdrop-blur-sm rounded-full shadow-soft flex items-center justify-center text-foreground hover:bg-background transition-colors"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button 
-              onClick={isRTL ? prevSlide : nextSlide}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-background/80 backdrop-blur-sm rounded-full shadow-soft flex items-center justify-center text-foreground hover:bg-background transition-colors"
-            >
-              <ChevronRight size={20} />
-            </button>
-
-            {/* Slide Image */}
-            <div className="overflow-hidden rounded-2xl mx-10">
-              <img 
-                src={heroProducts} 
-                alt="BV-Cosmatics Premium Skincare Collection" 
-                className="w-full h-auto transition-transform duration-500"
-              />
-            </div>
-
-            {/* Dots Indicator */}
-            <div className="flex justify-center gap-2 mt-4">
-              {heroSlides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentSlide 
-                      ? 'bg-primary w-6' 
-                      : 'bg-border hover:bg-muted-foreground'
-                  }`}
-                />
-              ))}
+          {/* Banner Image */}
+          <div className="relative aspect-[16/6] md:aspect-[1300/600] w-full">
+            <img 
+              src={heroBanner} 
+              alt="BV-Cosmatics Premium Skincare Collection" 
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            
+            {/* Overlay Content */}
+            <div className="absolute inset-0 bg-gradient-to-r from-charcoal/40 via-transparent to-transparent flex items-center">
+              <div className="container-custom">
+                <div className="max-w-md text-start ps-4 md:ps-8">
+                  <span 
+                    key={currentSlide}
+                    className="inline-block text-xs uppercase tracking-[0.2em] text-background/80 font-medium mb-3 animate-fade-up"
+                  >
+                    {t(heroSlides[currentSlide].label, heroSlides[currentSlide].labelAr)}
+                  </span>
+                  <h1 className="font-display text-2xl md:text-4xl lg:text-5xl font-medium text-background mb-4 leading-tight">
+                    {t('Luxury Skincare', 'العناية الفاخرة بالبشرة')}
+                  </h1>
+                  <button className="bg-background text-foreground px-6 py-2.5 md:px-8 md:py-3 rounded-full font-medium text-sm md:text-base hover:bg-background/90 transition-colors shadow-soft">
+                    {t('Shop Now', 'تسوقي الآن')}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* CTA Button */}
-          <button className="btn-ghost text-base">
-            {t('Shop Now', 'تسوق الآن')}
-          </button>
+          {/* Dots Indicator */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentSlide 
+                    ? 'bg-background w-6' 
+                    : 'bg-background/50 hover:bg-background/70'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
