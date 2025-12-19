@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import ProductCard from './ProductCard';
 import { products, categories } from '@/data/products';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const ProductsSection = () => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const { language, t } = useLanguage();
 
   const filteredProducts = activeCategory === 'all' 
     ? products 
@@ -14,9 +16,9 @@ const ProductsSection = () => {
       <div className="container-custom">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <span className="label-subtle mb-3 block">Our Collection</span>
+          <span className="label-subtle mb-3 block">{t('Our Collection', 'مجموعتنا')}</span>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-            Premium Skincare
+            {t('Premium Skincare', 'العناية الفاخرة بالبشرة')}
           </h2>
         </div>
 
@@ -32,7 +34,7 @@ const ProductsSection = () => {
                   : 'bg-secondary text-secondary-foreground hover:bg-cream-dark'
               }`}
             >
-              {category.name}
+              {language === 'ar' ? category.nameAr : category.name}
             </button>
           ))}
         </div>
