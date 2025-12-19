@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Plus, Loader2 } from 'lucide-react';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
@@ -32,7 +33,7 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
 
   return (
     <div className="card-product group">
-      <a href={`/product/${node.handle}`} className="block">
+      <Link to={`/product/${node.handle}`} className="block">
         <div className="relative aspect-[4/5] bg-secondary overflow-hidden">
           {image && (
             <img 
@@ -42,14 +43,14 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
             />
           )}
         </div>
-      </a>
+      </Link>
 
       <div className="p-5">
-        <a href={`/product/${node.handle}`}>
+        <Link to={`/product/${node.handle}`}>
           <h3 className="font-display text-lg font-medium text-foreground mb-1 leading-tight hover:text-primary transition-colors">
             {node.title}
           </h3>
-        </a>
+        </Link>
         
         <div className="flex items-center justify-between mt-3">
           <span className="font-body text-lg font-semibold text-foreground">
