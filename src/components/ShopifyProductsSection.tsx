@@ -13,6 +13,15 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   const firstVariant = node.variants.edges[0]?.node;
   const image = node.images.edges[0]?.node;
 
+  // Calculate savings
+  const currentPrice = parseFloat(node.priceRange.minVariantPrice.amount);
+  const compareAtPrice = node.compareAtPriceRange?.minVariantPrice?.amount 
+    ? parseFloat(node.compareAtPriceRange.minVariantPrice.amount) 
+    : null;
+  const savings = compareAtPrice && compareAtPrice > currentPrice 
+    ? Math.round(compareAtPrice - currentPrice) 
+    : null;
+
   const handleAddToCart = () => {
     if (!firstVariant) return;
 
@@ -32,7 +41,16 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   };
 
   return (
-    <div className="card-product group">
+    <div className="card-product group relative">
+      {/* Savings Badge */}
+      {savings && (
+        <div className="absolute top-3 start-3 z-10">
+          <div className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+            <span>{t(`Save ${savings} EGP`, `وفّر ${savings} ج.م`)}</span>
+          </div>
+        </div>
+      )}
+
       <Link to={`/product/${node.handle}`} className="block">
         <div className="relative aspect-[4/5] bg-secondary overflow-hidden">
           {image && (
@@ -53,9 +71,16 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
         </Link>
         
         <div className="flex items-center justify-between mt-3">
-          <span className="font-body text-lg font-semibold text-foreground">
-            {node.priceRange.minVariantPrice.currencyCode} {parseFloat(node.priceRange.minVariantPrice.amount).toFixed(2)}
-          </span>
+          <div className="flex items-baseline gap-2">
+            <span className="font-body text-lg font-semibold text-foreground">
+              {currentPrice.toFixed(0)} {t('EGP', 'ج.م')}
+            </span>
+            {compareAtPrice && compareAtPrice > currentPrice && (
+              <span className="text-sm text-muted-foreground line-through">
+                {compareAtPrice.toFixed(0)} {t('EGP', 'ج.م')}
+              </span>
+            )}
+          </div>
           
           <button 
             onClick={handleAddToCart}
@@ -78,7 +103,7 @@ const ShopifyProductsSection = () => {
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const fetchedProducts = await fetchShopifyProducts(50);
+      const fetchedProducts = await fetchShopifyProducts(4);
       setProducts(fetchedProducts);
       setLoading(false);
     };
