@@ -31,11 +31,13 @@ export const CartDrawer = () => {
     try {
       const checkoutUrl = await createCheckout();
       if (checkoutUrl) {
-        window.open(checkoutUrl, '_blank');
+        // Using noopener,noreferrer to prevent tabnabbing attacks
+        const newWindow = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+        if (newWindow) newWindow.opener = null;
         setIsOpen(false);
       }
-    } catch (error) {
-      console.error('Checkout failed:', error);
+    } catch {
+      // Silent fail - user sees loading state revert
     }
   };
 
