@@ -79,8 +79,8 @@ const BundleSection = () => {
                     <p className="text-sm text-muted-foreground">{product.size}</p>
                   </div>
                   <div className="text-end flex-shrink-0">
-                    <span className="font-body font-semibold text-foreground">${product.price}</span>
-                    <span className="text-sm text-muted-foreground line-through ms-2">${product.originalPrice}</span>
+                    <span className="font-body font-semibold text-foreground">{product.price} ج.م</span>
+                    <span className="text-sm text-muted-foreground line-through ms-2">{product.originalPrice} ج.م</span>
                   </div>
                 </div>
               ))}
@@ -91,10 +91,10 @@ const BundleSection = () => {
               <div className="text-center sm:text-start">
                 <p className="text-sm text-muted-foreground mb-1">{t('Bundle Price', 'سعر المجموعة')}</p>
                 <div className="flex items-baseline gap-2 flex-wrap justify-center sm:justify-start">
-                  <span className="font-display text-3xl font-semibold text-foreground">${bundle.totalPrice}</span>
-                  <span className="text-lg text-muted-foreground line-through">${bundle.originalTotal}</span>
+                  <span className="font-display text-3xl font-semibold text-foreground">{bundle.totalPrice} ج.م</span>
+                  <span className="text-lg text-muted-foreground line-through">{bundle.originalTotal} ج.م</span>
                   <span className="text-sm font-medium text-primary">
-                    {t(`Save $${bundle.originalTotal - bundle.totalPrice}`, `وفري $${bundle.originalTotal - bundle.totalPrice}`)}
+                    {t(`Save ${bundle.originalTotal - bundle.totalPrice} EGP`, `وفري ${bundle.originalTotal - bundle.totalPrice} ج.م`)}
                   </span>
                 </div>
               </div>
