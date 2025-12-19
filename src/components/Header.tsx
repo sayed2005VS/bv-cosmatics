@@ -1,6 +1,7 @@
-import { ShoppingBag, Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { CartDrawer } from './CartDrawer';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,12 +54,7 @@ const Header = () => {
             </button>
 
             {/* Cart */}
-            <button className="relative p-2 text-foreground hover:text-primary transition-colors">
-              <ShoppingBag size={22} />
-              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-primary text-primary-foreground text-xs font-semibold rounded-full flex items-center justify-center">
-                2
-              </span>
-            </button>
+            <CartDrawer />
           </div>
         </div>
 
