@@ -72,8 +72,8 @@ export default {
         },
       },
       fontFamily: {
-        display: ["Cormorant Garamond", "serif"],
-        body: ["Montserrat", "sans-serif"],
+        display: ["Tajawal", "sans-serif"],
+        body: ["Tajawal", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
