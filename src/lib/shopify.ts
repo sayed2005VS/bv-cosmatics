@@ -4,7 +4,35 @@ import { toast } from "sonner";
 const SHOPIFY_API_VERSION = '2025-07';
 const SHOPIFY_STORE_PERMANENT_DOMAIN = 'nnbp6n-4x.myshopify.com';
 const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
+// Storefront tokens are designed for client-side use with read-only product access
 const SHOPIFY_STOREFRONT_TOKEN = 'c6985cc2e8eb413426a972bac7e4a101';
+
+// Input validation helpers
+const MAX_PRODUCTS_LIMIT = 100;
+const PRODUCT_HANDLE_PATTERN = /^[a-z0-9-]+$/;
+const ALLOWED_QUERY_CHARS = /^[a-zA-Z0-9\s:*_-]+$/;
+
+function validateFirstParam(first: number): number {
+  if (typeof first !== 'number' || first < 1) return 1;
+  if (first > MAX_PRODUCTS_LIMIT) return MAX_PRODUCTS_LIMIT;
+  return first;
+}
+
+function validateProductHandle(handle: string): string | null {
+  if (!handle || typeof handle !== 'string') return null;
+  const trimmed = handle.trim().toLowerCase();
+  if (!PRODUCT_HANDLE_PATTERN.test(trimmed)) return null;
+  if (trimmed.length > 255) return null;
+  return trimmed;
+}
+
+function sanitizeQueryString(query: string): string | null {
+  if (!query || typeof query !== 'string') return null;
+  const trimmed = query.trim();
+  if (!ALLOWED_QUERY_CHARS.test(trimmed)) return null;
+  if (trimmed.length > 500) return null;
+  return trimmed;
+}
 
 export interface ShopifyProduct {
   node: {
@@ -82,13 +110,13 @@ export async function storefrontApiRequest(query: string, variables: Record<stri
   }
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error('Unable to connect to store');
   }
 
   const data = await response.json();
   
   if (data.errors) {
-    throw new Error(`Error calling Shopify: ${data.errors.map((e: { message: string }) => e.message).join(', ')}`);
+    throw new Error('Unable to load store data');
   }
 
   return data;
@@ -258,56 +286,60 @@ const CART_CREATE_MUTATION = `
 // API Functions
 export async function fetchShopifyProducts(first: number = 50, query?: string): Promise<ShopifyProduct[]> {
   try {
-    const data = await storefrontApiRequest(STOREFRONT_PRODUCTS_QUERY, { first, query });
+    const validatedFirst = validateFirstParam(first);
+    const sanitizedQuery = query ? sanitizeQueryString(query) : undefined;
+    
+    const data = await storefrontApiRequest(STOREFRONT_PRODUCTS_QUERY, { 
+      first: validatedFirst, 
+      query: sanitizedQuery 
+    });
     if (!data) return [];
     return data.data.products.edges || [];
-  } catch (error) {
-    console.error('Error fetching Shopify products:', error);
+  } catch {
     return [];
   }
 }
 
 export async function fetchProductByHandle(handle: string): Promise<ShopifyProduct['node'] | null> {
   try {
-    const data = await storefrontApiRequest(STOREFRONT_PRODUCT_BY_HANDLE_QUERY, { handle });
+    const validatedHandle = validateProductHandle(handle);
+    if (!validatedHandle) {
+      return null;
+    }
+    
+    const data = await storefrontApiRequest(STOREFRONT_PRODUCT_BY_HANDLE_QUERY, { handle: validatedHandle });
     if (!data) return null;
     return data.data.productByHandle;
-  } catch (error) {
-    console.error('Error fetching product:', error);
+  } catch {
     return null;
   }
 }
 
 export async function createStorefrontCheckout(items: Array<{ variantId: string; quantity: number }>): Promise<string> {
-  try {
-    const lines = items.map(item => ({
-      quantity: item.quantity,
-      merchandiseId: item.variantId,
-    }));
+  const lines = items.map(item => ({
+    quantity: Math.max(1, Math.min(item.quantity, 100)),
+    merchandiseId: item.variantId,
+  }));
 
-    const cartData = await storefrontApiRequest(CART_CREATE_MUTATION, {
-      input: { lines },
-    });
+  const cartData = await storefrontApiRequest(CART_CREATE_MUTATION, {
+    input: { lines },
+  });
 
-    if (!cartData) {
-      throw new Error('Failed to create cart');
-    }
-
-    if (cartData.data.cartCreate.userErrors.length > 0) {
-      throw new Error(`Cart creation failed: ${cartData.data.cartCreate.userErrors.map((e: { message: string }) => e.message).join(', ')}`);
-    }
-
-    const cart = cartData.data.cartCreate.cart;
-    
-    if (!cart.checkoutUrl) {
-      throw new Error('No checkout URL returned from Shopify');
-    }
-
-    const url = new URL(cart.checkoutUrl);
-    url.searchParams.set('channel', 'online_store');
-    return url.toString();
-  } catch (error) {
-    console.error('Error creating storefront checkout:', error);
-    throw error;
+  if (!cartData) {
+    throw new Error('Unable to create checkout');
   }
+
+  if (cartData.data.cartCreate.userErrors.length > 0) {
+    throw new Error('Unable to process your cart');
+  }
+
+  const cart = cartData.data.cartCreate.cart;
+  
+  if (!cart.checkoutUrl) {
+    throw new Error('Checkout unavailable');
+  }
+
+  const url = new URL(cart.checkoutUrl);
+  url.searchParams.set('channel', 'online_store');
+  return url.toString();
 }
