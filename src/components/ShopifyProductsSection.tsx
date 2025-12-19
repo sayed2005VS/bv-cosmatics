@@ -42,14 +42,6 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
 
   return (
     <div className="card-product group relative">
-      {/* Savings Badge */}
-      {savings && (
-        <div className="absolute top-3 start-3 z-10">
-          <div className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-            <span>{t(`Save ${savings} EGP`, `وفّر ${savings} ج.م`)}</span>
-          </div>
-        </div>
-      )}
 
       <Link to={`/product/${node.handle}`} className="block">
         <div className="relative aspect-[4/5] bg-secondary overflow-hidden">

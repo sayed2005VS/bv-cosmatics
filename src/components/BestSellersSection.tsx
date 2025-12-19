@@ -42,20 +42,12 @@ const BestSellerCard = ({ product }: { product: ShopifyProduct }) => {
 
   return (
     <div className="card-product group relative">
-      {/* Badges Container */}
-      <div className="absolute top-3 start-3 z-10 flex flex-col gap-2">
-        {/* Best Seller Badge */}
+      {/* Best Seller Badge */}
+      <div className="absolute top-3 start-3 z-10">
         <div className="flex items-center gap-1 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium shadow-gold">
           <Star size={12} className="fill-current" />
           <span>{t('Best Seller', 'الأكثر مبيعاً')}</span>
         </div>
-        
-        {/* Savings Badge */}
-        {savings && (
-          <div className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-            <span>{t(`Save ${savings} EGP`, `وفّر ${savings} ج.م`)}</span>
-          </div>
-        )}
       </div>
 
       <Link to={`/product/${node.handle}`} className="block">
