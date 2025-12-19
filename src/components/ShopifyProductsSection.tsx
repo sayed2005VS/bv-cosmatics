@@ -91,9 +91,9 @@ const ShopifyProductsSection = () => {
       <section id="products" className="section-padding bg-background">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <span className="label-subtle mb-3 block">{t('Our Collection', 'مجموعتنا')}</span>
+            <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-              {t('Premium Skincare', 'العناية الفاخرة بالبشرة')}
+              {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
             </h2>
           </div>
           <div className="flex items-center justify-center py-20">
@@ -109,9 +109,9 @@ const ShopifyProductsSection = () => {
       <section id="products" className="section-padding bg-background">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <span className="label-subtle mb-3 block">{t('Our Collection', 'مجموعتنا')}</span>
+            <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-              {t('Premium Skincare', 'العناية الفاخرة بالبشرة')}
+              {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
             </h2>
           </div>
           <div className="text-center py-20">
@@ -131,9 +131,9 @@ const ShopifyProductsSection = () => {
     <section id="products" className="section-padding bg-background">
       <div className="container-custom">
         <div className="text-center mb-12">
-          <span className="label-subtle mb-3 block">{t('Our Collection', 'مجموعتنا')}</span>
+          <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-            {t('Premium Skincare', 'العناية الفاخرة بالبشرة')}
+            {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
           </h2>
         </div>
 
