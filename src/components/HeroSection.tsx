@@ -1,26 +1,33 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import heroBanner from '@/assets/hero-banner.png';
+import heroBanner1 from '@/assets/hero-banner.png';
+import heroBanner2 from '@/assets/hero-banner-2.png';
+import heroBanner3 from '@/assets/hero-banner-3.png';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { heroSlides } from '@/data/products';
+
+const heroImages = [
+  { src: heroBanner1, alt: 'BV Cosmatics - مجموعة العناية الفاخرة' },
+  { src: heroBanner2, alt: 'BV Cosmatics - سيروم فاخر للبشرة' },
+  { src: heroBanner3, alt: 'BV Cosmatics - كريمات ترطيب فاخرة' },
+];
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { t, isRTL } = useLanguage();
+  const { isRTL } = useLanguage();
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    setCurrentSlide((prev) => (prev + 1) % heroImages.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
   };
 
   return (
@@ -42,18 +49,23 @@ const HeroSection = () => {
             <ChevronRight size={20} />
           </button>
 
-          {/* Banner Image */}
-          <div className="relative aspect-[16/6] md:aspect-[1300/600] w-full">
-            <img 
-              src={heroBanner} 
-              alt="BV-Cosmatics Premium Skincare Collection" 
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+          {/* Banner Images Slider */}
+          <div className="relative aspect-[16/6] md:aspect-[1300/600] w-full overflow-hidden">
+            {heroImages.map((image, index) => (
+              <img 
+                key={index}
+                src={image.src} 
+                alt={image.alt}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                  index === currentSlide ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
           </div>
 
           {/* Dots Indicator */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-            {heroSlides.map((_, index) => (
+            {heroImages.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
