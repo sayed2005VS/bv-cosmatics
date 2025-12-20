@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Loader2, Star } from 'lucide-react';
+import { Plus, Loader2, Star, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -148,6 +149,16 @@ const BestSellersSection = () => {
               <BestSellerCard product={product} />
             </div>
           ))}
+        </div>
+
+        {/* View All Button */}
+        <div className="flex justify-center mt-8">
+          <Button asChild variant="outline" size="lg" className="gap-2">
+            <Link to="/products">
+              {t('View All Products', 'عرض جميع المنتجات')}
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
