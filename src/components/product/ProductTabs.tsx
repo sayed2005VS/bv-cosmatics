@@ -1,12 +1,34 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ShopifyMetafield } from '@/lib/shopify';
 
 interface ProductTabsProps {
   description: string;
+  metafields?: Array<ShopifyMetafield | null>;
 }
 
-const ProductTabs = ({ description }: ProductTabsProps) => {
+const ProductTabs = ({ description, metafields }: ProductTabsProps) => {
   const { t, isRTL } = useLanguage();
+
+  // Extract metafield values
+  const getMetafieldValue = (key: string): string | null => {
+    if (!metafields) return null;
+    const field = metafields.find(m => m?.key === key);
+    return field?.value || null;
+  };
+
+  const ingredients = getMetafieldValue('ingredients');
+  const usageInstructions = getMetafieldValue('usage_instructions');
+  const shippingInfo = getMetafieldValue('shipping_info');
+
+  // Parse multiline text into array
+  const parseLines = (text: string | null): string[] => {
+    if (!text) return [];
+    return text.split('\n').filter(line => line.trim());
+  };
+
+  const ingredientsList = parseLines(ingredients);
+  const usageSteps = parseLines(usageInstructions);
 
   return (
     <Tabs defaultValue="description" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -45,89 +67,123 @@ const ProductTabs = ({ description }: ProductTabsProps) => {
 
       <TabsContent value="ingredients" className="mt-6 animate-fade-in">
         <div className="space-y-4 text-muted-foreground">
-          <p className="text-sm leading-relaxed">
-            {t('productTabs.ingredientsIntro')}
-          </p>
-          <ul className={`space-y-2 text-sm ${isRTL ? 'pr-4' : 'pl-4'}`}>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              {t('productTabs.ingredientsList.hyaluronicAcid')}
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              {t('productTabs.ingredientsList.vitaminE')}
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              {t('productTabs.ingredientsList.naturalExtracts')}
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              {t('productTabs.ingredientsList.aloeVera')}
-            </li>
-          </ul>
+          {ingredientsList.length > 0 ? (
+            <ul className={`space-y-2 text-sm ${isRTL ? 'pr-4' : 'pl-4'}`}>
+              {ingredientsList.map((ingredient, index) => (
+                <li key={index} className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  {ingredient}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <>
+              <p className="text-sm leading-relaxed">
+                {t('productTabs.ingredientsIntro')}
+              </p>
+              <ul className={`space-y-2 text-sm ${isRTL ? 'pr-4' : 'pl-4'}`}>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  {t('productTabs.ingredientsList.hyaluronicAcid')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  {t('productTabs.ingredientsList.vitaminE')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  {t('productTabs.ingredientsList.naturalExtracts')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  {t('productTabs.ingredientsList.aloeVera')}
+                </li>
+              </ul>
+            </>
+          )}
         </div>
       </TabsContent>
 
       <TabsContent value="usage" className="mt-6 animate-fade-in">
         <div className="space-y-3 text-muted-foreground">
-          <ol className={`space-y-3 text-sm leading-relaxed ${isRTL ? 'pr-4' : 'pl-4'}`}>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">1</span>
-              <span className="pt-0.5">{t('productTabs.usageSteps.step1')}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">2</span>
-              <span className="pt-0.5">{t('productTabs.usageSteps.step2')}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">3</span>
-              <span className="pt-0.5">{t('productTabs.usageSteps.step3')}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">4</span>
-              <span className="pt-0.5">{t('productTabs.usageSteps.step4')}</span>
-            </li>
-          </ol>
+          {usageSteps.length > 0 ? (
+            <ol className={`space-y-3 text-sm leading-relaxed ${isRTL ? 'pr-4' : 'pl-4'}`}>
+              {usageSteps.map((step, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">
+                    {index + 1}
+                  </span>
+                  <span className="pt-0.5">{step}</span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <ol className={`space-y-3 text-sm leading-relaxed ${isRTL ? 'pr-4' : 'pl-4'}`}>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">1</span>
+                <span className="pt-0.5">{t('productTabs.usageSteps.step1')}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">2</span>
+                <span className="pt-0.5">{t('productTabs.usageSteps.step2')}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">3</span>
+                <span className="pt-0.5">{t('productTabs.usageSteps.step3')}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">4</span>
+                <span className="pt-0.5">{t('productTabs.usageSteps.step4')}</span>
+              </li>
+            </ol>
+          )}
         </div>
       </TabsContent>
 
       <TabsContent value="shipping" className="mt-6 animate-fade-in">
         <div className="grid gap-6 sm:grid-cols-2 text-muted-foreground text-sm">
-          <div className="space-y-3 p-4 rounded-xl bg-secondary/30">
-            <h4 className="font-semibold text-foreground">{t('productTabs.shipping.title')}</h4>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                {t('productTabs.shipping.free')}
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                {t('productTabs.shipping.delivery')}
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                {t('productTabs.shipping.sameDay')}
-              </li>
-            </ul>
-          </div>
-          <div className="space-y-3 p-4 rounded-xl bg-secondary/30">
-            <h4 className="font-semibold text-foreground">{t('productTabs.returns.title')}</h4>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                {t('productTabs.returns.policy')}
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                {t('productTabs.returns.condition')}
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                {t('productTabs.returns.refund')}
-              </li>
-            </ul>
-          </div>
+          {shippingInfo ? (
+            <div className="sm:col-span-2 space-y-3 p-4 rounded-xl bg-secondary/30">
+              <div className="whitespace-pre-line">{shippingInfo}</div>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-3 p-4 rounded-xl bg-secondary/30">
+                <h4 className="font-semibold text-foreground">{t('productTabs.shipping.title')}</h4>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    {t('productTabs.shipping.free')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    {t('productTabs.shipping.delivery')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    {t('productTabs.shipping.sameDay')}
+                  </li>
+                </ul>
+              </div>
+              <div className="space-y-3 p-4 rounded-xl bg-secondary/30">
+                <h4 className="font-semibold text-foreground">{t('productTabs.returns.title')}</h4>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    {t('productTabs.returns.policy')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    {t('productTabs.returns.condition')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    {t('productTabs.returns.refund')}
+                  </li>
+                </ul>
+              </div>
+            </>
+          )}
         </div>
       </TabsContent>
     </Tabs>

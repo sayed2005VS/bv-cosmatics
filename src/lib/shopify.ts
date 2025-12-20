@@ -38,6 +38,12 @@ function sanitizeQueryString(query: string): string | null {
   return trimmed;
 }
 
+export interface ShopifyMetafield {
+  key: string;
+  value: string;
+  type: string;
+}
+
 export interface ShopifyProduct {
   node: {
     id: string;
@@ -89,6 +95,7 @@ export interface ShopifyProduct {
       name: string;
       values: string[];
     }>;
+    metafields?: Array<ShopifyMetafield | null>;
   };
 }
 
@@ -238,6 +245,15 @@ const STOREFRONT_PRODUCT_BY_HANDLE_QUERY = `
       options {
         name
         values
+      }
+      metafields(identifiers: [
+        {namespace: "custom", key: "ingredients"},
+        {namespace: "custom", key: "usage_instructions"},
+        {namespace: "custom", key: "shipping_info"}
+      ]) {
+        key
+        value
+        type
       }
     }
   }

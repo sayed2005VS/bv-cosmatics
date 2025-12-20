@@ -322,7 +322,7 @@ const ProductPage = () => {
 
           {/* Product Tabs */}
           <div className="mt-12 animate-fade-in">
-            <ProductTabs description={product.description} />
+            <ProductTabs description={product.description} metafields={product.metafields} />
           </div>
 
           {/* Product Reviews */}
