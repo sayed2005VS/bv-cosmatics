@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   const { t } = useLanguage();
@@ -85,28 +86,43 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
 const ShopifyProductsSection = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const fetchedProducts = await fetchShopifyProducts(5);
-      setProducts(fetchedProducts.slice(0, 5)); // Max 5 products
+      const fetchedProducts = await fetchShopifyProducts(10);
+      setProducts(fetchedProducts);
       setLoading(false);
     };
 
     loadProducts();
   }, []);
 
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 280;
+      const newScrollLeft = scrollContainerRef.current.scrollLeft + 
+        (direction === 'left' ? -scrollAmount : scrollAmount) * (isRTL ? -1 : 1);
+      scrollContainerRef.current.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   if (loading) {
     return (
       <section id="products" className="section-padding bg-background">
         <div className="container-custom">
-          <div className="text-center mb-12">
-            <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-              {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
-            </h2>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
+              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
+                {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
+              </h2>
+            </div>
           </div>
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -120,11 +136,13 @@ const ShopifyProductsSection = () => {
     return (
       <section id="products" className="section-padding bg-background">
         <div className="container-custom">
-          <div className="text-center mb-12">
-            <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-              {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
-            </h2>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
+              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
+                {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
+              </h2>
+            </div>
           </div>
           <div className="text-center py-20">
             <p className="text-muted-foreground text-lg mb-4">
@@ -139,19 +157,49 @@ const ShopifyProductsSection = () => {
   return (
     <section id="products" className="section-padding bg-background">
       <div className="container-custom">
-        <div className="text-center mb-12">
-          <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-            {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
-          </h2>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <span className="label-subtle mb-3 block">{t('Discover', 'اكتشفي')}</span>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
+              {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
+            </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex gap-2">
+              <button 
+                onClick={() => scroll('left')}
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button 
+                onClick={() => scroll('right')}
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+            <Link to="/products">
+              <Button variant="outline" size="sm">
+                {t('View All', 'عرض الكل')}
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        <div 
+          ref={scrollContainerRef}
+          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4"
+          style={{ scrollSnapType: 'x mandatory' }}
+        >
           {products.map((product, index) => (
             <div 
               key={product.node.id}
-              className="animate-fade-up"
-              style={{ animationDelay: `${index * 50}ms` }}
+              className="flex-shrink-0 w-[calc(50%-6px)] sm:w-[calc(33.333%-8px)] md:w-[calc(25%-9px)] lg:w-[calc(20%-10px)] animate-fade-up"
+              style={{ 
+                animationDelay: `${index * 50}ms`,
+                scrollSnapAlign: 'start'
+              }}
             >
               <ShopifyProductCard product={product} />
             </div>
