@@ -10,7 +10,7 @@ const ProductTabs = ({ description }: ProductTabsProps) => {
 
   return (
     <Tabs defaultValue="description" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
-      <TabsList className="w-full justify-start bg-secondary/50 rounded-xl p-1.5 h-auto flex-wrap gap-1">
+      <TabsList className="w-full justify-center bg-secondary/50 rounded-xl p-1.5 h-auto flex-wrap gap-1">
         <TabsTrigger 
           value="description" 
           className="rounded-lg px-4 py-2.5 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
