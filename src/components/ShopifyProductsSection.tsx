@@ -5,7 +5,6 @@ import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 
 const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   const { t } = useLanguage();
@@ -157,15 +156,6 @@ const ShopifyProductsSection = () => {
               <ShopifyProductCard product={product} />
             </div>
           ))}
-        </div>
-
-        {/* View All Button */}
-        <div className="text-center mt-8">
-          <Link to="/products">
-            <Button variant="outline" size="lg" className="px-8">
-              {t('View All', 'عرض الكل')}
-            </Button>
-          </Link>
         </div>
       </div>
     </section>
