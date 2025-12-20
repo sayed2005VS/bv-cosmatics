@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import heroBanner1 from '@/assets/hero-banner.png';
 import heroBanner2 from '@/assets/hero-banner-2.png';
 import heroBanner3 from '@/assets/hero-banner-3.png';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
 
 const heroImages = [
   { src: heroBanner1, alt: 'BV Cosmatics - مجموعة العناية الفاخرة' },
@@ -13,7 +15,7 @@ const heroImages = [
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -28,6 +30,13 @@ const HeroSection = () => {
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  };
+
+  const scrollToProducts = () => {
+    const productsSection = document.getElementById('products');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -61,6 +70,18 @@ const HeroSection = () => {
                 }`}
               />
             ))}
+            
+            {/* CTA Overlay */}
+            <div className="absolute inset-0 flex items-end justify-center pb-12 md:pb-16 z-10">
+              <Button 
+                onClick={scrollToProducts}
+                size="lg"
+                className="btn-gold gap-2 text-base md:text-lg px-6 md:px-8 py-5 md:py-6 shadow-gold animate-fade-up"
+              >
+                <ShoppingBag size={20} />
+                {t('Shop Now', 'تسوقي الآن')}
+              </Button>
+            </div>
           </div>
 
           {/* Dots Indicator */}
