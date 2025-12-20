@@ -2,9 +2,162 @@ import { useState, useEffect } from 'react';
 import { bundle } from '@/data/products';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCartStore } from '@/stores/cartStore';
-import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
+import { storefrontApiRequest, ShopifyProduct } from '@/lib/shopify';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+
+// Product handles for the Xpresso bundle
+const BUNDLE_PRODUCT_HANDLES = [
+  'hair-mask-xpresso',
+  'conditioner-xpresso',
+  'shampoo-xpresso'
+];
+
+const BUNDLE_PRODUCTS_QUERY = `
+  query GetBundleProducts($handle1: String!, $handle2: String!, $handle3: String!) {
+    product1: productByHandle(handle: $handle1) {
+      id
+      title
+      description
+      handle
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      compareAtPriceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      images(first: 1) {
+        edges {
+          node {
+            url
+            altText
+          }
+        }
+      }
+      variants(first: 1) {
+        edges {
+          node {
+            id
+            title
+            price {
+              amount
+              currencyCode
+            }
+            compareAtPrice {
+              amount
+              currencyCode
+            }
+            availableForSale
+            selectedOptions {
+              name
+              value
+            }
+          }
+        }
+      }
+    }
+    product2: productByHandle(handle: $handle2) {
+      id
+      title
+      description
+      handle
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      compareAtPriceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      images(first: 1) {
+        edges {
+          node {
+            url
+            altText
+          }
+        }
+      }
+      variants(first: 1) {
+        edges {
+          node {
+            id
+            title
+            price {
+              amount
+              currencyCode
+            }
+            compareAtPrice {
+              amount
+              currencyCode
+            }
+            availableForSale
+            selectedOptions {
+              name
+              value
+            }
+          }
+        }
+      }
+    }
+    product3: productByHandle(handle: $handle3) {
+      id
+      title
+      description
+      handle
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      compareAtPriceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      images(first: 1) {
+        edges {
+          node {
+            url
+            altText
+          }
+        }
+      }
+      variants(first: 1) {
+        edges {
+          node {
+            id
+            title
+            price {
+              amount
+              currencyCode
+            }
+            compareAtPrice {
+              amount
+              currencyCode
+            }
+            availableForSale
+            selectedOptions {
+              name
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 const BundleSection = () => {
   const { language, t } = useLanguage();
@@ -13,13 +166,28 @@ const BundleSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadBundleProducts = async () => {
       setLoading(true);
-      const products = await fetchShopifyProducts(3);
-      setShopifyProducts(products);
+      try {
+        const data = await storefrontApiRequest(BUNDLE_PRODUCTS_QUERY, {
+          handle1: BUNDLE_PRODUCT_HANDLES[0],
+          handle2: BUNDLE_PRODUCT_HANDLES[1],
+          handle3: BUNDLE_PRODUCT_HANDLES[2],
+        });
+        
+        if (data?.data) {
+          const products: ShopifyProduct[] = [];
+          if (data.data.product1) products.push({ node: data.data.product1 });
+          if (data.data.product2) products.push({ node: data.data.product2 });
+          if (data.data.product3) products.push({ node: data.data.product3 });
+          setShopifyProducts(products);
+        }
+      } catch (error) {
+        console.error('Failed to load bundle products:', error);
+      }
       setLoading(false);
     };
-    loadProducts();
+    loadBundleProducts();
   }, []);
 
   const handleAddBundleToCart = () => {
