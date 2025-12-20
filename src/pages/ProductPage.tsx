@@ -12,6 +12,7 @@ import ProductImageGallery from '@/components/product/ProductImageGallery';
 import TrustBadges from '@/components/product/TrustBadges';
 import ProductTabs from '@/components/product/ProductTabs';
 import RelatedProducts from '@/components/product/RelatedProducts';
+import ProductReviews from '@/components/product/ProductReviews';
 import SocialShare from '@/components/product/SocialShare';
 import StickyAddToCart from '@/components/product/StickyAddToCart';
 import StockIndicator from '@/components/product/StockIndicator';
@@ -322,6 +323,11 @@ const ProductPage = () => {
           {/* Product Tabs */}
           <div className="mt-12 animate-fade-in">
             <ProductTabs description={product.description} />
+          </div>
+
+          {/* Product Reviews */}
+          <div className="animate-fade-in">
+            <ProductReviews productId={product.id} productTitle={product.title} />
           </div>
 
           {/* Related Products */}
