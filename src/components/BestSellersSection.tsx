@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Loader2, Star, ArrowRight, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Plus, Loader2, Star } from 'lucide-react';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -132,20 +131,11 @@ const BestSellersSection = () => {
   return (
     <section className="section-padding bg-secondary">
       <div className="container-custom">
-        <div className="flex items-center justify-between mb-12">
-          <div className="text-center flex-1">
-            <span className="label-subtle mb-3 block">{t('Top Picks', 'الأكثر طلباً')}</span>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-              {t('Best Sellers', 'المنتجات الأكثر مبيعاً')}
-            </h2>
-          </div>
-          <Link to="/products">
-            <Button variant="outline" size="sm" className="gap-2">
-              {t('View All', 'عرض الكل')}
-              <ArrowRight className="w-4 h-4 rtl:hidden" />
-              <ArrowLeft className="w-4 h-4 ltr:hidden" />
-            </Button>
-          </Link>
+        <div className="text-center mb-12">
+          <span className="label-subtle mb-3 block">{t('Top Picks', 'الأكثر طلباً')}</span>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
+            {t('Best Sellers', 'المنتجات الأكثر مبيعاً')}
+          </h2>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
