@@ -312,8 +312,8 @@ const BundleSection = () => {
                     <p className="text-sm text-muted-foreground">{product.size}</p>
                   </div>
                   <div className="text-end flex-shrink-0">
-                    <span className="font-body font-semibold text-foreground">{Math.round(product.price)} ج.م</span>
-                    <span className="text-sm text-muted-foreground line-through ms-2">{Math.round(product.originalPrice)} ج.م</span>
+                    <span className="font-body font-semibold text-foreground">{Math.round(product.price)} {language === 'ar' ? 'ج.م' : 'EGP'}</span>
+                    <span className="text-sm text-muted-foreground line-through ms-2">{Math.round(product.originalPrice)} {language === 'ar' ? 'ج.م' : 'EGP'}</span>
                   </div>
                 </div>
               ))}
@@ -324,10 +324,10 @@ const BundleSection = () => {
               <div className="text-center sm:text-start">
                 <p className="text-sm text-muted-foreground mb-1">{t('Bundle Price', 'سعر المجموعة')}</p>
                 <div className="flex items-baseline gap-2 flex-wrap justify-center sm:justify-start">
-                  <span className="font-display text-3xl font-semibold text-foreground">{Math.round(bundleTotalPrice)} ج.م</span>
-                  <span className="text-lg text-muted-foreground line-through">{Math.round(bundleOriginalTotal)} ج.م</span>
+                  <span className="font-display text-3xl font-semibold text-foreground">{Math.round(bundleTotalPrice)} {language === 'ar' ? 'ج.م' : 'EGP'}</span>
+                  <span className="text-lg text-muted-foreground line-through">{Math.round(bundleOriginalTotal)} {language === 'ar' ? 'ج.م' : 'EGP'}</span>
                   <span className="text-sm font-medium text-primary">
-                    {t(`Save ${Math.round(bundleOriginalTotal - bundleTotalPrice)} EGP`, `وفري ${Math.round(bundleOriginalTotal - bundleTotalPrice)} ج.م`)}
+                    {language === 'ar' ? `وفري ${Math.round(bundleOriginalTotal - bundleTotalPrice)} ج.م` : `Save ${Math.round(bundleOriginalTotal - bundleTotalPrice)} EGP`}
                   </span>
                 </div>
               </div>
