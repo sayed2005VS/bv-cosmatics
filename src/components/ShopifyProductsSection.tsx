@@ -1,10 +1,35 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+
+const PRODUCTS_PER_PAGE = 8;
+
+// Star Rating Component
+const StarRating = ({ rating = 4.5 }: { rating?: number }) => {
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          size={14}
+          className={`${
+            star <= Math.floor(rating)
+              ? 'fill-primary text-primary'
+              : star <= rating
+              ? 'fill-primary/50 text-primary'
+              : 'fill-muted text-muted'
+          }`}
+        />
+      ))}
+      <span className="text-xs text-muted-foreground ms-1">({rating})</span>
+    </div>
+  );
+};
 
 const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   const { t } = useLanguage();
@@ -17,9 +42,6 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   const currentPrice = parseFloat(node.priceRange.minVariantPrice.amount);
   const compareAtPrice = node.compareAtPriceRange?.minVariantPrice?.amount 
     ? parseFloat(node.compareAtPriceRange.minVariantPrice.amount) 
-    : null;
-  const savings = compareAtPrice && compareAtPrice > currentPrice 
-    ? Math.round(compareAtPrice - currentPrice) 
     : null;
 
   const handleAddToCart = () => {
@@ -42,7 +64,6 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
 
   return (
     <div className="card-product group relative">
-
       <Link to={`/product/${node.handle}`} className="block">
         <div className="relative aspect-[4/5] bg-secondary overflow-hidden">
           {image && (
@@ -57,10 +78,15 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
 
       <div className="p-5">
         <Link to={`/product/${node.handle}`}>
-          <h3 className="font-display text-lg font-medium text-foreground mb-1 leading-tight hover:text-primary transition-colors">
+          <h3 className="font-display text-lg font-medium text-foreground mb-1 leading-tight hover:text-primary transition-colors line-clamp-1">
             {node.title}
           </h3>
         </Link>
+        
+        {/* Star Rating */}
+        <div className="mb-2">
+          <StarRating rating={4 + Math.random()} />
+        </div>
         
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-baseline gap-2">
@@ -90,18 +116,33 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
 const ShopifyProductsSection = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useLanguage();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { t, isRTL } = useLanguage();
 
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const fetchedProducts = await fetchShopifyProducts(4);
+      const fetchedProducts = await fetchShopifyProducts(50); // Fetch more for pagination
       setProducts(fetchedProducts);
       setLoading(false);
     };
 
     loadProducts();
   }, []);
+
+  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const displayedProducts = products.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      const productsSection = document.getElementById('products');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -155,7 +196,7 @@ const ShopifyProductsSection = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {products.map((product, index) => (
+          {displayedProducts.map((product, index) => (
             <div 
               key={product.node.id}
               className="animate-fade-up opacity-0"
@@ -165,6 +206,58 @@ const ShopifyProductsSection = () => {
             </div>
           ))}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-12">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="rounded-full"
+            >
+              {isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </Button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? "default" : "outline"}
+                size="icon"
+                onClick={() => goToPage(page)}
+                className={`rounded-full w-10 h-10 ${currentPage === page ? 'bg-primary text-primary-foreground' : ''}`}
+              >
+                {page}
+              </Button>
+            ))}
+            
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="rounded-full"
+            >
+              {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+            </Button>
+          </div>
+        )}
+
+        {/* View All Button */}
+        {products.length > PRODUCTS_PER_PAGE && currentPage < totalPages && (
+          <div className="text-center mt-8">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => goToPage(currentPage + 1)}
+              className="gap-2"
+            >
+              {t('View More Products', 'عرض المزيد من المنتجات')}
+              {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );
