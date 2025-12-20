@@ -6,87 +6,126 @@ interface ProductTabsProps {
 }
 
 const ProductTabs = ({ description }: ProductTabsProps) => {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   return (
-    <Tabs defaultValue="description" className="w-full">
-      <TabsList className="w-full justify-start bg-secondary/50 rounded-xl p-1 h-auto flex-wrap">
+    <Tabs defaultValue="description" className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
+      <TabsList className="w-full justify-start bg-secondary/50 rounded-xl p-1.5 h-auto flex-wrap gap-1">
         <TabsTrigger 
           value="description" 
-          className="rounded-lg px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          className="rounded-lg px-4 py-2.5 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
         >
-          {t('Description', 'الوصف')}
+          {t('product.description')}
         </TabsTrigger>
         <TabsTrigger 
           value="ingredients" 
-          className="rounded-lg px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          className="rounded-lg px-4 py-2.5 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
         >
-          {t('Ingredients', 'المكونات')}
+          {t('product.ingredients')}
         </TabsTrigger>
         <TabsTrigger 
           value="usage" 
-          className="rounded-lg px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          className="rounded-lg px-4 py-2.5 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
         >
-          {t('How to Use', 'طريقة الاستخدام')}
+          {t('product.howToUse')}
         </TabsTrigger>
         <TabsTrigger 
           value="shipping" 
-          className="rounded-lg px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          className="rounded-lg px-4 py-2.5 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
         >
-          {t('Shipping & Returns', 'الشحن والإرجاع')}
+          {t('product.shippingReturns')}
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="description" className="mt-4 animate-fade-in">
+      <TabsContent value="description" className="mt-6 animate-fade-in">
         <div className="prose prose-sm max-w-none text-muted-foreground leading-relaxed">
-          {description || t('No description available', 'لا يوجد وصف متاح')}
+          {description || t('product.noDescription')}
         </div>
       </TabsContent>
 
-      <TabsContent value="ingredients" className="mt-4 animate-fade-in">
-        <div className="space-y-3 text-muted-foreground">
+      <TabsContent value="ingredients" className="mt-6 animate-fade-in">
+        <div className="space-y-4 text-muted-foreground">
           <p className="text-sm leading-relaxed">
-            {t(
-              'Our products are formulated with high-quality ingredients that are gentle on your skin.',
-              'منتجاتنا مصنوعة من مكونات عالية الجودة ولطيفة على بشرتك.'
-            )}
+            {t('productTabs.ingredientsIntro')}
           </p>
-          <ul className="list-disc list-inside space-y-1 text-sm">
-            <li>{t('Hyaluronic Acid', 'حمض الهيالورونيك')}</li>
-            <li>{t('Vitamin E', 'فيتامين E')}</li>
-            <li>{t('Natural Extracts', 'مستخلصات طبيعية')}</li>
-            <li>{t('Aloe Vera', 'الصبار')}</li>
+          <ul className={`space-y-2 text-sm ${isRTL ? 'pr-4' : 'pl-4'}`}>
+            <li className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              {t('productTabs.ingredientsList.hyaluronicAcid')}
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              {t('productTabs.ingredientsList.vitaminE')}
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              {t('productTabs.ingredientsList.naturalExtracts')}
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              {t('productTabs.ingredientsList.aloeVera')}
+            </li>
           </ul>
         </div>
       </TabsContent>
 
-      <TabsContent value="usage" className="mt-4 animate-fade-in">
+      <TabsContent value="usage" className="mt-6 animate-fade-in">
         <div className="space-y-3 text-muted-foreground">
-          <ol className="list-decimal list-inside space-y-2 text-sm leading-relaxed">
-            <li>{t('Cleanse your face thoroughly', 'نظفي وجهك جيداً')}</li>
-            <li>{t('Apply a small amount to your face', 'ضعي كمية صغيرة على وجهك')}</li>
-            <li>{t('Massage gently in circular motions', 'دلكي بلطف بحركات دائرية')}</li>
-            <li>{t('Use morning and night for best results', 'استخدميه صباحاً ومساءً للحصول على أفضل النتائج')}</li>
+          <ol className={`space-y-3 text-sm leading-relaxed ${isRTL ? 'pr-4' : 'pl-4'}`}>
+            <li className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">1</span>
+              <span className="pt-0.5">{t('productTabs.usageSteps.step1')}</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">2</span>
+              <span className="pt-0.5">{t('productTabs.usageSteps.step2')}</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">3</span>
+              <span className="pt-0.5">{t('productTabs.usageSteps.step3')}</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">4</span>
+              <span className="pt-0.5">{t('productTabs.usageSteps.step4')}</span>
+            </li>
           </ol>
         </div>
       </TabsContent>
 
-      <TabsContent value="shipping" className="mt-4 animate-fade-in">
-        <div className="space-y-4 text-muted-foreground text-sm">
-          <div>
-            <h4 className="font-medium text-foreground mb-1">{t('Shipping', 'الشحن')}</h4>
-            <ul className="space-y-1">
-              <li>• {t('Free shipping on orders over 500 EGP', 'شحن مجاني للطلبات فوق 500 جنيه')}</li>
-              <li>• {t('Delivery within 2-5 business days', 'التوصيل خلال 2-5 أيام عمل')}</li>
-              <li>• {t('Same day delivery in Cairo', 'توصيل في نفس اليوم في القاهرة')}</li>
+      <TabsContent value="shipping" className="mt-6 animate-fade-in">
+        <div className="grid gap-6 sm:grid-cols-2 text-muted-foreground text-sm">
+          <div className="space-y-3 p-4 rounded-xl bg-secondary/30">
+            <h4 className="font-semibold text-foreground">{t('productTabs.shipping.title')}</h4>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                {t('productTabs.shipping.free')}
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                {t('productTabs.shipping.delivery')}
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                {t('productTabs.shipping.sameDay')}
+              </li>
             </ul>
           </div>
-          <div>
-            <h4 className="font-medium text-foreground mb-1">{t('Returns', 'الإرجاع')}</h4>
-            <ul className="space-y-1">
-              <li>• {t('14 days return policy', 'سياسة إرجاع 14 يوم')}</li>
-              <li>• {t('Product must be unopened', 'يجب أن يكون المنتج مغلقاً')}</li>
-              <li>• {t('Full refund or exchange', 'استرداد كامل أو استبدال')}</li>
+          <div className="space-y-3 p-4 rounded-xl bg-secondary/30">
+            <h4 className="font-semibold text-foreground">{t('productTabs.returns.title')}</h4>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                {t('productTabs.returns.policy')}
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                {t('productTabs.returns.condition')}
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                {t('productTabs.returns.refund')}
+              </li>
             </ul>
           </div>
         </div>

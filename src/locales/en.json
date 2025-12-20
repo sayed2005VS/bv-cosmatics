@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "offers": "Offers",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "product": {
+    "description": "Description",
+    "ingredients": "Ingredients",
+    "howToUse": "How to Use",
+    "shippingReturns": "Shipping & Returns",
+    "noDescription": "No description available",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "inStock": "In Stock",
+    "lowStock": "Low Stock",
+    "outOfStock": "Out of Stock",
+    "quantity": "Quantity",
+    "size": "Size",
+    "relatedProducts": "You May Also Like"
+  },
+  "productTabs": {
+    "ingredientsIntro": "Our products are formulated with high-quality ingredients that are gentle on your skin.",
+    "ingredientsList": {
+      "hyaluronicAcid": "Hyaluronic Acid",
+      "vitaminE": "Vitamin E",
+      "naturalExtracts": "Natural Extracts",
+      "aloeVera": "Aloe Vera"
+    },
+    "usageSteps": {
+      "step1": "Cleanse your face thoroughly",
+      "step2": "Apply a small amount to your face",
+      "step3": "Massage gently in circular motions",
+      "step4": "Use morning and night for best results"
+    },
+    "shipping": {
+      "title": "Shipping",
+      "free": "Free shipping on orders over 500 EGP",
+      "delivery": "Delivery within 2-5 business days",
+      "sameDay": "Same day delivery in Cairo"
+    },
+    "returns": {
+      "title": "Returns",
+      "policy": "14 days return policy",
+      "condition": "Product must be unopened",
+      "refund": "Full refund or exchange"
+    }
+  },
+  "trustBadges": {
+    "freeShipping": "Free Shipping",
+    "freeShippingDesc": "On orders over 500 EGP",
+    "securePayment": "Secure Payment",
+    "securePaymentDesc": "100% Protected",
+    "easyReturns": "Easy Returns",
+    "easyReturnsDesc": "Within 14 days",
+    "support": "Support",
+    "supportDesc": "24/7 Available"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "total": "Total",
+    "checkout": "Checkout",
+    "continueShopping": "Continue Shopping"
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "products": "Products"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "notFound": "Not Found",
+    "productNotFound": "Product not found",
+    "backToHome": "Back to Home"
+  },
+  "share": {
+    "title": "Share",
+    "copyLink": "Copy Link",
+    "copied": "Copied!"
+  },
+  "wishlist": {
+    "add": "Add to Wishlist",
+    "remove": "Remove from Wishlist",
+    "added": "Added to Wishlist",
+    "removed": "Removed from Wishlist"
+  }
+}
