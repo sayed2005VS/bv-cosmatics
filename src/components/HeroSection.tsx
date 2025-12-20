@@ -70,18 +70,6 @@ const HeroSection = () => {
                 }`}
               />
             ))}
-            
-            {/* CTA Overlay */}
-            <div className="absolute inset-0 flex items-end justify-center pb-12 md:pb-16 z-10">
-              <Button 
-                onClick={scrollToProducts}
-                size="lg"
-                className="btn-gold gap-2 text-base md:text-lg px-6 md:px-8 py-5 md:py-6 shadow-gold animate-fade-up"
-              >
-                <ShoppingBag size={20} />
-                {t('Shop Now', 'تسوقي الآن')}
-              </Button>
-            </div>
           </div>
 
           {/* Dots Indicator */}
@@ -98,6 +86,18 @@ const HeroSection = () => {
               />
             ))}
           </div>
+        </div>
+
+        {/* CTA Button - Below Banner */}
+        <div className="flex justify-center mt-6">
+          <Button 
+            onClick={scrollToProducts}
+            size="lg"
+            className="btn-gold gap-2 text-base md:text-lg px-6 md:px-8 py-5 md:py-6 shadow-gold animate-fade-up"
+          >
+            <ShoppingBag size={20} />
+            {t('Shop Now', 'تسوقي الآن')}
+          </Button>
         </div>
       </div>
     </section>
