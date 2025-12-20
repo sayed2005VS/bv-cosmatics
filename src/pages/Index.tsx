@@ -7,6 +7,7 @@ import PromoBanner from '@/components/PromoBanner';
 import BundleSection from '@/components/BundleSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import Footer from '@/components/Footer';
+import WhatsAppWidget from '@/components/WhatsAppWidget';
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
         <TestimonialsSection />
       </main>
       <Footer />
+      <WhatsAppWidget />
     </div>
   );
 };
