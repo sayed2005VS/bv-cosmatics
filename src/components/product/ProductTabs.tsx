@@ -17,7 +17,7 @@ const ProductTabs = ({ description, metafields }: ProductTabsProps) => {
     return field?.value || null;
   };
 
-  // Get translated metafield with fallback - keys are like "ingredients_ar" or "ingredients_en"
+  // Get translated metafield with fallback
   const getTranslatedMetafield = (baseKey: string): string | null => {
     const primaryKey = `${baseKey}_${language}`;
     const fallbackKey = `${baseKey}_${language === 'ar' ? 'en' : 'ar'}`;

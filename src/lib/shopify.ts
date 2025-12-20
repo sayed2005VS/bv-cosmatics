@@ -246,12 +246,22 @@ const STOREFRONT_PRODUCT_BY_HANDLE_QUERY = `
         name
         values
       }
-      metafields(identifiers: [
-        {namespace: "custom", key: "ingredients_ar"},
-        {namespace: "custom", key: "ingredients_en"},
-        {namespace: "custom", key: "usage_instructions_ar"},
-        {namespace: "custom", key: "usage_instructions_en"}
-      ]) {
+      ingredients_ar: metafield(namespace: "custom", key: "ingredients_ar") {
+        key
+        value
+        type
+      }
+      ingredients_en: metafield(namespace: "custom", key: "ingredients_en") {
+        key
+        value
+        type
+      }
+      usage_instructions_ar: metafield(namespace: "custom", key: "usage_instructions_ar") {
+        key
+        value
+        type
+      }
+      usage_instructions_en: metafield(namespace: "custom", key: "usage_instructions_en") {
         key
         value
         type
@@ -330,7 +340,23 @@ export async function fetchProductByHandle(handle: string): Promise<ShopifyProdu
     
     const data = await storefrontApiRequest(STOREFRONT_PRODUCT_BY_HANDLE_QUERY, { handle: validatedHandle });
     if (!data) return null;
-    return data.data.productByHandle;
+    
+    const product = data.data.productByHandle;
+    if (!product) return null;
+    
+    // Convert individual metafield properties to array format
+    const metafields: Array<ShopifyMetafield | null> = [
+      product.ingredients_ar,
+      product.ingredients_en,
+      product.usage_instructions_ar,
+      product.usage_instructions_en
+    ];
+    
+    // Return product with metafields array
+    return {
+      ...product,
+      metafields
+    };
   } catch {
     return null;
   }
