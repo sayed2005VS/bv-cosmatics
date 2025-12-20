@@ -11,29 +11,41 @@
 // ================================
 // Remove #lovable-badge (High Priority)
 // ================================
+/**
+ * Remove Lovable AI badge – Force Mode
+ */
 export const removeLovableBadge = () => {
-  const removeBadge = () => {
+  const killBadge = () => {
+    // محاولة حذف عادي
     const badge = document.querySelector("#lovable-badge");
     if (badge) {
       badge.remove();
     }
+
+    // محاولة إخفاء بأي selector محتمل
+    document.querySelectorAll('#lovable-badge, [id*="lovable"], [class*="lovable"]').forEach((el) => {
+      el.style.display = "none";
+      el.style.visibility = "hidden";
+      el.style.opacity = "0";
+      el.style.pointerEvents = "none";
+    });
   };
 
   // تشغيل فوري
-  removeBadge();
+  killBadge();
 
-  // مراقبة الصفحة لو العنصر اتضاف لاحقًا
-  const observer = new MutationObserver(removeBadge);
+  // كل 100ms (Lovable بيعيد الحقن)
+  const interval = setInterval(killBadge, 100);
+
+  // مراقبة أي DOM جديد
+  const observer = new MutationObserver(killBadge);
   observer.observe(document.documentElement, {
     childList: true,
     subtree: true,
   });
 };
 
-// تشغيل تلقائي بأعلى أولوية
+// تشغيل تلقائي
 removeLovableBadge();
 
-// ================================
-// Placeholder export to prevent empty module error
-// ================================
 export const CUSTOM_CODE_VERSION = "1.0.0";
