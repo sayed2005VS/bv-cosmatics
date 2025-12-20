@@ -139,7 +139,8 @@ const WhatsAppWidget = () => {
     if (!selectedCountry) return;
     const phone = countriesData[selectedCountry].whatsapp;
     const message = buildWhatsAppMessage();
-    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+    const newWindow = window.open(`https://wa.me/${phone}?text=${message}`, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
     handleClose();
   };
 
