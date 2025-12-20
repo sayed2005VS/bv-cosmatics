@@ -247,9 +247,10 @@ const STOREFRONT_PRODUCT_BY_HANDLE_QUERY = `
         values
       }
       metafields(identifiers: [
-        {namespace: "custom", key: "ingredients"},
-        {namespace: "custom", key: "usage_instructions"},
-        {namespace: "custom", key: "shipping_info"}
+        {namespace: "custom", key: "ingredients_ar"},
+        {namespace: "custom", key: "ingredients_en"},
+        {namespace: "custom", key: "usage_instructions_ar"},
+        {namespace: "custom", key: "usage_instructions_en"}
       ]) {
         key
         value

@@ -8,7 +8,7 @@ interface ProductTabsProps {
 }
 
 const ProductTabs = ({ description, metafields }: ProductTabsProps) => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
 
   // Extract metafield values
   const getMetafieldValue = (key: string): string | null => {
@@ -17,8 +17,16 @@ const ProductTabs = ({ description, metafields }: ProductTabsProps) => {
     return field?.value || null;
   };
 
-  const ingredients = getMetafieldValue('ingredients');
-  const usageInstructions = getMetafieldValue('usage_instructions');
+  // Get translated metafield with fallback
+  const getTranslatedMetafield = (baseKey: string): string | null => {
+    const primaryKey = `${baseKey}_${language}`;
+    const fallbackKey = `${baseKey}_${language === 'ar' ? 'en' : 'ar'}`;
+    
+    return getMetafieldValue(primaryKey) || getMetafieldValue(fallbackKey);
+  };
+
+  const ingredients = getTranslatedMetafield('ingredients');
+  const usageInstructions = getTranslatedMetafield('usage_instructions');
 
   // Parse multiline text into array
   const parseLines = (text: string | null): string[] => {
