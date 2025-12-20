@@ -24,10 +24,11 @@ export const removeLovableBadge = () => {
 
     // محاولة إخفاء بأي selector محتمل
     document.querySelectorAll('#lovable-badge, [id*="lovable"], [class*="lovable"]').forEach((el) => {
-      el.style.display = "none";
-      el.style.visibility = "hidden";
-      el.style.opacity = "0";
-      el.style.pointerEvents = "none";
+      const htmlEl = el as HTMLElement;
+      htmlEl.style.display = "none";
+      htmlEl.style.visibility = "hidden";
+      htmlEl.style.opacity = "0";
+      htmlEl.style.pointerEvents = "none";
     });
   };
 

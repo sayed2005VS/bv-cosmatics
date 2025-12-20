@@ -41,7 +41,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <span className="font-body text-lg font-semibold text-foreground">
               ${product.price}
             </span>
-            {product.originalPrice && (
+            {product.originalPrice && product.originalPrice !== product.price && (
               <span className="text-sm text-muted-foreground line-through">
                 ${product.originalPrice}
               </span>
