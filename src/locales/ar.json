@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "offers": "العروض",
+    "about": "من نحن",
+    "contact": "اتصل بنا"
+  },
+  "product": {
+    "description": "الوصف",
+    "ingredients": "المكونات",
+    "howToUse": "طريقة الاستخدام",
+    "shippingReturns": "الشحن والإرجاع",
+    "noDescription": "لا يوجد وصف متاح",
+    "addToCart": "أضف للسلة",
+    "buyNow": "اشتري الآن",
+    "inStock": "متوفر",
+    "lowStock": "كمية محدودة",
+    "outOfStock": "غير متوفر",
+    "quantity": "الكمية",
+    "size": "الحجم",
+    "relatedProducts": "منتجات قد تعجبك"
+  },
+  "productTabs": {
+    "ingredientsIntro": "منتجاتنا مصنوعة من مكونات عالية الجودة ولطيفة على بشرتك.",
+    "ingredientsList": {
+      "hyaluronicAcid": "حمض الهيالورونيك",
+      "vitaminE": "فيتامين E",
+      "naturalExtracts": "مستخلصات طبيعية",
+      "aloeVera": "الصبار"
+    },
+    "usageSteps": {
+      "step1": "نظفي وجهك جيداً",
+      "step2": "ضعي كمية صغيرة على وجهك",
+      "step3": "دلكي بلطف بحركات دائرية",
+      "step4": "استخدميه صباحاً ومساءً للحصول على أفضل النتائج"
+    },
+    "shipping": {
+      "title": "الشحن",
+      "free": "شحن مجاني للطلبات فوق 500 جنيه",
+      "delivery": "التوصيل خلال 2-5 أيام عمل",
+      "sameDay": "توصيل في نفس اليوم في القاهرة"
+    },
+    "returns": {
+      "title": "الإرجاع",
+      "policy": "سياسة إرجاع 14 يوم",
+      "condition": "يجب أن يكون المنتج مغلقاً",
+      "refund": "استرداد كامل أو استبدال"
+    }
+  },
+  "trustBadges": {
+    "freeShipping": "شحن مجاني",
+    "freeShippingDesc": "للطلبات فوق 500 جنيه",
+    "securePayment": "دفع آمن",
+    "securePaymentDesc": "حماية 100%",
+    "easyReturns": "إرجاع سهل",
+    "easyReturnsDesc": "خلال 14 يوم",
+    "support": "دعم فني",
+    "supportDesc": "24/7 متاحين"
+  },
+  "cart": {
+    "title": "سلة التسوق",
+    "empty": "السلة فارغة",
+    "total": "المجموع",
+    "checkout": "إتمام الشراء",
+    "continueShopping": "متابعة التسوق"
+  },
+  "breadcrumb": {
+    "home": "الرئيسية",
+    "products": "المنتجات"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "notFound": "غير موجود",
+    "productNotFound": "المنتج غير موجود",
+    "backToHome": "العودة للرئيسية"
+  },
+  "share": {
+    "title": "مشاركة",
+    "copyLink": "نسخ الرابط",
+    "copied": "تم النسخ!"
+  },
+  "wishlist": {
+    "add": "أضف للمفضلة",
+    "remove": "إزالة من المفضلة",
+    "added": "تمت الإضافة للمفضلة",
+    "removed": "تمت الإزالة من المفضلة"
+  }
+}
