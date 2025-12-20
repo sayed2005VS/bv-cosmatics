@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Loader2, Star } from 'lucide-react';
+import { Plus, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 const BestSellerCard = ({ product }: { product: ShopifyProduct }) => {
   const { t } = useLanguage();
@@ -37,7 +38,7 @@ const BestSellerCard = ({ product }: { product: ShopifyProduct }) => {
   };
 
   return (
-    <div className="card-product group relative">
+    <div className="card-product group relative min-w-[180px] w-[180px] sm:min-w-[200px] sm:w-[200px] md:min-w-[220px] md:w-[220px] flex-shrink-0">
       {/* Best Seller Badge */}
       <div className="absolute top-3 start-3 z-10">
         <div className="flex items-center gap-1 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium shadow-gold">
@@ -93,13 +94,28 @@ const BestSellerCard = ({ product }: { product: ShopifyProduct }) => {
 const BestSellersSection = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      const scrollAmount = 300;
+      const newScrollLeft = direction === 'left' 
+        ? carouselRef.current.scrollLeft - scrollAmount
+        : carouselRef.current.scrollLeft + scrollAmount;
+      
+      carouselRef.current.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const fetchedProducts = await fetchShopifyProducts(5);
-      setProducts(fetchedProducts.slice(0, 5)); // Max 5 products
+      const fetchedProducts = await fetchShopifyProducts(10);
+      setProducts(fetchedProducts);
       setLoading(false);
     };
 
@@ -131,23 +147,59 @@ const BestSellersSection = () => {
   return (
     <section className="section-padding bg-secondary">
       <div className="container-custom">
-        <div className="text-center mb-12">
-          <span className="label-subtle mb-3 block">{t('Top Picks', 'الأكثر طلباً')}</span>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
-            {t('Best Sellers', 'المنتجات الأكثر مبيعاً')}
-          </h2>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <span className="label-subtle mb-3 block">{t('Top Picks', 'الأكثر طلباً')}</span>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-medium text-foreground">
+              {t('Best Sellers', 'المنتجات الأكثر مبيعاً')}
+            </h2>
+          </div>
+          
+          {/* Navigation Arrows */}
+          <div className="hidden sm:flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => scroll(isRTL ? 'right' : 'left')}
+              className="rounded-full w-10 h-10"
+            >
+              <ChevronLeft size={20} />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => scroll(isRTL ? 'left' : 'right')}
+              className="rounded-full w-10 h-10"
+            >
+              <ChevronRight size={20} />
+            </Button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        {/* Products Carousel */}
+        <div 
+          ref={carouselRef}
+          className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 snap-x snap-mandatory"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {products.map((product, index) => (
             <div 
               key={product.node.id}
-              className="animate-fade-up"
+              className="snap-start animate-fade-up"
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <BestSellerCard product={product} />
             </div>
           ))}
+        </div>
+
+        {/* View All Button */}
+        <div className="text-center mt-8">
+          <Link to="/products">
+            <Button variant="outline" size="lg" className="px-8">
+              {t('View All', 'عرض الكل')}
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
