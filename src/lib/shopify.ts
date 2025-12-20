@@ -9,8 +9,9 @@ const SHOPIFY_STOREFRONT_TOKEN = 'c6985cc2e8eb413426a972bac7e4a101';
 
 // Input validation helpers
 const MAX_PRODUCTS_LIMIT = 100;
-const PRODUCT_HANDLE_PATTERN = /^[a-z0-9-]+$/;
-const ALLOWED_QUERY_CHARS = /^[a-zA-Z0-9\s:*_-]+$/;
+// Updated pattern to support Arabic characters and URL-encoded handles
+const PRODUCT_HANDLE_PATTERN = /^[\u0600-\u06FFa-z0-9\-]+$/;
+const ALLOWED_QUERY_CHARS = /^[\u0600-\u06FFa-zA-Z0-9\s:*_-]+$/;
 
 function validateFirstParam(first: number): number {
   if (typeof first !== 'number' || first < 1) return 1;
@@ -20,7 +21,10 @@ function validateFirstParam(first: number): number {
 
 function validateProductHandle(handle: string): string | null {
   if (!handle || typeof handle !== 'string') return null;
-  const trimmed = handle.trim().toLowerCase();
+  // Decode URL-encoded handles first
+  const decoded = decodeURIComponent(handle.trim());
+  const trimmed = decoded.toLowerCase();
+  // Support Arabic characters and standard handle characters
   if (!PRODUCT_HANDLE_PATTERN.test(trimmed)) return null;
   if (trimmed.length > 255) return null;
   return trimmed;
