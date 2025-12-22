@@ -11,7 +11,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-export const CartDrawer = () => {
+interface CartDrawerProps {
+  forceWhite?: boolean;
+}
+
+export const CartDrawer = ({ forceWhite = false }: CartDrawerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
   const { 
@@ -44,7 +48,13 @@ export const CartDrawer = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <button className="relative p-2 text-foreground hover:text-primary transition-colors">
+        <button 
+          className={`relative p-2 transition-colors ${
+            forceWhite 
+              ? 'text-white hover:text-white/80' 
+              : 'text-foreground hover:text-primary'
+          }`}
+        >
           <ShoppingBag size={22} />
           {totalItems > 0 && (
             <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-primary text-primary-foreground text-xs font-semibold rounded-full flex items-center justify-center">
