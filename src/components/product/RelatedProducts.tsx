@@ -5,7 +5,6 @@ import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { useInfiniteSlider } from '@/hooks/useInfiniteSlider';
 
 interface RelatedProductsProps {
   currentProductId: string;
@@ -16,11 +15,6 @@ const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const addItem = useCartStore((state) => state.addItem);
-  
-  const { containerRef, handlers } = useInfiniteSlider({
-    itemCount: products.length,
-    autoPlay: false,
-  });
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -78,17 +72,13 @@ const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
       <h2 className="font-display text-2xl text-foreground">
         {t('You May Also Like', 'قد يعجبك أيضاً')}
       </h2>
-      <div 
-        ref={containerRef}
-        className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 cursor-grab active:cursor-grabbing touch-pan-x md:grid md:grid-cols-4 md:overflow-visible"
-        {...handlers}
-      >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {products.map((product) => {
           const image = product.node.images.edges[0]?.node;
           const price = product.node.priceRange.minVariantPrice;
 
           return (
-            <div key={product.node.id} className="group flex-shrink-0 w-[calc(50%-8px)] md:w-auto">
+            <div key={product.node.id} className="group">
               <Link to={`/product/${product.node.handle}`}>
                 <div className="aspect-square bg-secondary/50 rounded-xl overflow-hidden mb-3 relative">
                   {image ? (

@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { useInfiniteSlider } from '@/hooks/useInfiniteSlider';
 
 const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   const { t } = useLanguage();
@@ -87,12 +86,8 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
 const ShopifyProductsSection = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useLanguage();
-  
-  const { containerRef, handlers } = useInfiniteSlider({
-    itemCount: products.length,
-    autoPlay: false,
-  });
+  const { t, isRTL } = useLanguage();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -104,6 +99,18 @@ const ShopifyProductsSection = () => {
 
     loadProducts();
   }, []);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 280;
+      const newScrollLeft = scrollContainerRef.current.scrollLeft + 
+        (direction === 'left' ? -scrollAmount : scrollAmount) * (isRTL ? -1 : 1);
+      scrollContainerRef.current.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -157,17 +164,33 @@ const ShopifyProductsSection = () => {
               {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
             </h2>
           </div>
-          <Link to="/products">
-            <Button variant="outline" size="sm">
-              {t('View All', 'عرض الكل')}
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex gap-2">
+              <button 
+                onClick={() => scroll('left')}
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button 
+                onClick={() => scroll('right')}
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+            <Link to="/products">
+              <Button variant="outline" size="sm">
+                {t('View All', 'عرض الكل')}
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div 
-          ref={containerRef}
-          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide touch-slider pb-4 -mx-4 px-4 cursor-grab active:cursor-grabbing touch-pan-x"
-          {...handlers}
+          ref={scrollContainerRef}
+          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4"
+          style={{ scrollSnapType: 'x mandatory' }}
         >
           {products.map((product, index) => (
             <div 

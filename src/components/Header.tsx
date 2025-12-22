@@ -1,24 +1,20 @@
-import { Menu, Globe } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CartDrawer } from './CartDrawer';
-import { MobileNav } from './MobileNav';
 
-interface HeaderProps {
-  isTransparent?: boolean;
-}
-
-const Header = ({ isTransparent = false }: HeaderProps) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      // Show header on mobile after scrolling past 50% of viewport
+      setIsScrolled(window.scrollY > window.innerHeight * 0.5);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -26,108 +22,83 @@ const Header = ({ isTransparent = false }: HeaderProps) => {
     setLanguage(language === 'ar' ? 'en' : 'ar');
   };
 
-  // Determine if header should be transparent (only when at top AND isTransparent prop is true)
-  const showTransparent = isTransparent && !isScrolled;
-
   return (
-    <>
-      <header 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          showTransparent 
-            ? 'bg-transparent' 
-            : 'bg-background/80 backdrop-blur-md border-b border-border/50 shadow-soft'
-        }`}
-        style={{ transition: 'var(--transition-header)' }}
-      >
-        <div className="container-custom">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className={`md:hidden p-2 transition-colors ${
-                showTransparent 
-                  ? 'text-white hover:text-white/80' 
-                  : 'text-foreground hover:text-primary'
-              }`}
-              aria-label="Toggle menu"
+    <header className={`fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50 transition-transform duration-300 md:translate-y-0 ${isScrolled ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`}>
+      <div className="container-custom">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* Logo */}
+          <a href="/" className="font-display text-xl md:text-2xl font-semibold tracking-tight text-foreground">
+            BV-Cosmatics
+          </a>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#products" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              {t('Products', 'المنتجات')}
+            </a>
+            <a href="#bundles" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              {t('Sets', 'المجموعات')}
+            </a>
+            <a href="#testimonials" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              {t('Reviews', 'التقييمات')}
+            </a>
+          </nav>
+
+          {/* Right Actions */}
+          <div className="flex items-center gap-3">
+            {/* Language Switcher */}
+            <button 
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 p-2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <Menu size={24} />
+              <Globe size={18} />
+              <span className="hidden sm:inline text-sm font-medium">{language === 'ar' ? 'EN' : 'عربي'}</span>
             </button>
 
-            {/* Logo */}
-            <a 
-              href="/" 
-              className={`font-display text-xl md:text-2xl font-semibold tracking-tight transition-colors ${
-                showTransparent ? 'text-white drop-shadow-lg' : 'text-foreground'
-              }`}
-            >
-              BV-Cosmatics
-            </a>
+            {/* Cart */}
+            <CartDrawer />
+          </div>
+        </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-8">
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <nav className="md:hidden py-4 border-t border-border/50 animate-fade-in">
+            <div className="flex flex-col gap-4">
               <a 
                 href="#products" 
-                className={`font-body text-sm font-medium transition-colors ${
-                  showTransparent 
-                    ? 'text-white/90 hover:text-white' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className="font-body text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setIsMenuOpen(false)}
               >
                 {t('Products', 'المنتجات')}
               </a>
               <a 
                 href="#bundles" 
-                className={`font-body text-sm font-medium transition-colors ${
-                  showTransparent 
-                    ? 'text-white/90 hover:text-white' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className="font-body text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setIsMenuOpen(false)}
               >
                 {t('Sets', 'المجموعات')}
               </a>
               <a 
                 href="#testimonials" 
-                className={`font-body text-sm font-medium transition-colors ${
-                  showTransparent 
-                    ? 'text-white/90 hover:text-white' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className="font-body text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setIsMenuOpen(false)}
               >
                 {t('Reviews', 'التقييمات')}
               </a>
-            </nav>
-
-            {/* Right Actions */}
-            <div className="flex items-center gap-3">
-              {/* Language Switcher */}
-              <button 
-                onClick={toggleLanguage}
-                className={`flex items-center gap-1.5 p-2 transition-colors ${
-                  showTransparent 
-                    ? 'text-white hover:text-white/80' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Globe size={18} />
-                <span className="hidden sm:inline text-sm font-medium">
-                  {language === 'ar' ? 'EN' : 'عربي'}
-                </span>
-              </button>
-
-              {/* Cart */}
-              <CartDrawer forceWhite={showTransparent} />
             </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Side Drawer Navigation */}
-      <MobileNav 
-        isOpen={isMobileMenuOpen} 
-        onClose={() => setIsMobileMenuOpen(false)} 
-      />
-    </>
+          </nav>
+        )}
+      </div>
+    </header>
   );
 };
 
