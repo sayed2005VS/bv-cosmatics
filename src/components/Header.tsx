@@ -1,18 +1,29 @@
 import { Menu, X, Globe } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CartDrawer } from './CartDrawer';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show header on mobile after scrolling past 50% of viewport
+      setIsScrolled(window.scrollY > window.innerHeight * 0.5);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleLanguage = () => {
     setLanguage(language === 'ar' ? 'en' : 'ar');
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+    <header className={`fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50 transition-transform duration-300 md:translate-y-0 ${isScrolled ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`}>
       <div className="container-custom">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Mobile Menu Button */}
