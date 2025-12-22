@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -86,8 +86,11 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
 const ShopifyProductsSection = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -100,15 +103,26 @@ const ShopifyProductsSection = () => {
     loadProducts();
   }, []);
 
-  const scroll = (direction: 'left' | 'right') => {
+  // Drag handlers for swipe functionality
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    setIsDragging(true);
+    const pageX = 'touches' in e ? e.touches[0].pageX : e.pageX;
+    setStartX(pageX - (scrollContainerRef.current?.offsetLeft || 0));
+    setScrollLeft(scrollContainerRef.current?.scrollLeft || 0);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const pageX = 'touches' in e ? e.touches[0].pageX : e.pageX;
+    const x = pageX - (scrollContainerRef.current?.offsetLeft || 0);
+    const walk = (x - startX) * 1.5;
     if (scrollContainerRef.current) {
-      const scrollAmount = 280;
-      const newScrollLeft = scrollContainerRef.current.scrollLeft + 
-        (direction === 'left' ? -scrollAmount : scrollAmount) * (isRTL ? -1 : 1);
-      scrollContainerRef.current.scrollTo({
-        left: newScrollLeft,
-        behavior: 'smooth'
-      });
+      scrollContainerRef.current.scrollLeft = scrollLeft - walk;
     }
   };
 
@@ -164,33 +178,23 @@ const ShopifyProductsSection = () => {
               {t('BV Cosmatics Products', 'منتجات BV Cosmatics')}
             </h2>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex gap-2">
-              <button 
-                onClick={() => scroll('left')}
-                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button 
-                onClick={() => scroll('right')}
-                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-            <Link to="/products">
-              <Button variant="outline" size="sm">
-                {t('View All', 'عرض الكل')}
-              </Button>
-            </Link>
-          </div>
+          <Link to="/products">
+            <Button variant="outline" size="sm">
+              {t('View All', 'عرض الكل')}
+            </Button>
+          </Link>
         </div>
 
         <div 
           ref={scrollContainerRef}
-          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4"
-          style={{ scrollSnapType: 'x mandatory' }}
+          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide touch-slider pb-4 -mx-4 px-4 cursor-grab active:cursor-grabbing"
+          onMouseDown={handleDragStart}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+          onMouseMove={handleDragMove}
+          onTouchStart={handleDragStart}
+          onTouchEnd={handleDragEnd}
+          onTouchMove={handleDragMove}
         >
           {products.map((product, index) => (
             <div 

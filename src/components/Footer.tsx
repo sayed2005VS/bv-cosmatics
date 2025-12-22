@@ -71,13 +71,23 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-background/50">
-            © 2024 BV-Cosmatics. {t('All rights reserved.', 'جميع الحقوق محفوظة.')}
-          </p>
-          <div className="flex gap-6">
+        {/* Bottom Bar - Dual Language Copyright */}
+        <div className="mt-16 pt-8 border-t border-background/10 flex flex-col gap-6">
+          {/* Dual-language copyright - side by side */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+            <p className="text-sm text-background/60 text-center">
+              Crafted for excellence by Taif | BV-Cosmatics, All rights reserved ©
+            </p>
+            <span className="hidden sm:block text-background/30">|</span>
+            <p className="text-sm text-background/60 text-center" dir="rtl">
+              صُنع بإتقان بواسطة طيف | BV-Cosmatics، جميع الحقوق محفوظة ©
+            </p>
+          </div>
+          
+          {/* Links */}
+          <div className="flex items-center justify-center gap-6">
             <a href="#" className="text-sm text-background/50 hover:text-background transition-colors">{t('Privacy Policy', 'سياسة الخصوصية')}</a>
+            <span className="text-background/30">•</span>
             <a href="#" className="text-sm text-background/50 hover:text-background transition-colors">{t('Terms of Service', 'شروط الخدمة')}</a>
           </div>
         </div>

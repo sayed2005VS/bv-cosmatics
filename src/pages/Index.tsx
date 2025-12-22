@@ -12,7 +12,7 @@ import WhatsAppWidget from '@/components/WhatsAppWidget';
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header isTransparent />
       <main>
         <HeroSection />
         <ShopifyProductsSection />
