@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Loader2 } from 'lucide-react';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
@@ -6,6 +6,7 @@ import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { useInfiniteSlider } from '@/hooks/useInfiniteSlider';
 
 const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   const { t } = useLanguage();
@@ -87,10 +88,11 @@ const ShopifyProductsSection = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  
+  const { containerRef, handlers } = useInfiniteSlider({
+    itemCount: products.length,
+    autoPlay: false,
+  });
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -102,29 +104,6 @@ const ShopifyProductsSection = () => {
 
     loadProducts();
   }, []);
-
-  // Drag handlers for swipe functionality
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDragging(true);
-    const pageX = 'touches' in e ? e.touches[0].pageX : e.pageX;
-    setStartX(pageX - (scrollContainerRef.current?.offsetLeft || 0));
-    setScrollLeft(scrollContainerRef.current?.scrollLeft || 0);
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const pageX = 'touches' in e ? e.touches[0].pageX : e.pageX;
-    const x = pageX - (scrollContainerRef.current?.offsetLeft || 0);
-    const walk = (x - startX) * 1.5;
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft = scrollLeft - walk;
-    }
-  };
 
   if (loading) {
     return (
@@ -186,15 +165,9 @@ const ShopifyProductsSection = () => {
         </div>
 
         <div 
-          ref={scrollContainerRef}
-          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide touch-slider pb-4 -mx-4 px-4 cursor-grab active:cursor-grabbing"
-          onMouseDown={handleDragStart}
-          onMouseUp={handleDragEnd}
-          onMouseLeave={handleDragEnd}
-          onMouseMove={handleDragMove}
-          onTouchStart={handleDragStart}
-          onTouchEnd={handleDragEnd}
-          onTouchMove={handleDragMove}
+          ref={containerRef}
+          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide touch-slider pb-4 -mx-4 px-4 cursor-grab active:cursor-grabbing touch-pan-x"
+          {...handlers}
         >
           {products.map((product, index) => (
             <div 
