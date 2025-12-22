@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShoppingBag, Menu, X, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import heroBanner1 from '@/assets/hero-banner.png';
 import heroBanner2 from '@/assets/hero-banner-2.png';
 import heroBanner3 from '@/assets/hero-banner-3.png';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
+import { CartDrawer } from './CartDrawer';
 
 const heroImages = [
   { src: heroBanner1, alt: 'BV Cosmatics - مجموعة العناية الفاخرة' },
@@ -15,7 +16,12 @@ const heroImages = [
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { isRTL, t } = useLanguage();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { language, setLanguage, isRTL, t } = useLanguage();
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'ar' ? 'en' : 'ar');
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -40,10 +46,74 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative pt-20 md:pt-24">
-      <div className="container-custom relative">
-        {/* Hero Banner - Wide Rectangle */}
-        <div className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-elevated">
+    <section className="relative pt-0 md:pt-24">
+      {/* Mobile Header - Integrated into Hero */}
+      <div className="md:hidden absolute top-0 left-0 right-0 z-30 p-4">
+        <div className="flex items-center justify-between">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-white hover:text-primary transition-colors bg-black/30 backdrop-blur-sm rounded-full"
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* Logo */}
+          <a href="/" className="font-display text-xl font-semibold tracking-tight text-white drop-shadow-lg">
+            BV-Cosmatics
+          </a>
+
+          {/* Right Actions */}
+          <div className="flex items-center gap-2">
+            {/* Language Switcher */}
+            <button 
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 p-2 text-white hover:text-primary transition-colors bg-black/30 backdrop-blur-sm rounded-full"
+            >
+              <Globe size={18} />
+            </button>
+
+            {/* Cart */}
+            <div className="bg-black/30 backdrop-blur-sm rounded-full">
+              <CartDrawer />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <nav className="mt-4 p-4 bg-background/95 backdrop-blur-md rounded-2xl shadow-elevated animate-fade-in">
+            <div className="flex flex-col gap-4">
+              <a 
+                href="#products" 
+                className="font-body text-base font-medium text-foreground hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t('Products', 'المنتجات')}
+              </a>
+              <a 
+                href="#bundles" 
+                className="font-body text-base font-medium text-foreground hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t('Sets', 'المجموعات')}
+              </a>
+              <a 
+                href="#testimonials" 
+                className="font-body text-base font-medium text-foreground hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t('Reviews', 'التقييمات')}
+              </a>
+            </div>
+          </nav>
+        )}
+      </div>
+
+      <div className="container-custom relative md:pt-0">
+        {/* Hero Banner - Wide Rectangle on Desktop, Tall on Mobile */}
+        <div className="relative w-full overflow-hidden rounded-none md:rounded-3xl shadow-elevated">
           {/* Navigation Arrows */}
           <button 
             onClick={isRTL ? nextSlide : prevSlide}
@@ -58,18 +128,20 @@ const HeroSection = () => {
             <ChevronRight size={20} />
           </button>
 
-          {/* Banner Images Slider */}
-          <div className="relative aspect-[16/6] md:aspect-[1300/600] w-full overflow-hidden">
+          {/* Banner Images Slider - Taller on Mobile (75vh) */}
+          <div className="relative h-[75vh] md:h-auto md:aspect-[1300/600] w-full overflow-hidden">
             {heroImages.map((image, index) => (
               <img 
                 key={index}
                 src={image.src} 
                 alt={image.alt}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${
                   index === currentSlide ? 'opacity-100' : 'opacity-0'
                 }`}
               />
             ))}
+            {/* Gradient overlay for mobile readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/30 md:hidden" />
           </div>
 
           {/* Dots Indicator */}
