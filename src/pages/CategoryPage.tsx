@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
-import { Plus } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import { toast } from 'sonner';
 import MobileBottomNav from '@/components/MobileBottomNav';
+import CategoryBundleSection from '@/components/CategoryBundleSection';
+import { getBundleByCategory } from '@/data/bundles';
 
 // Category name mapping for localization
 const categoryNameMap: Record<string, { en: string; ar: string }> = {
@@ -115,6 +116,7 @@ const CategoryPage = () => {
   const [loading, setLoading] = useState(true);
 
   const categoryName = slug ? getCategoryName(slug, language) : '';
+  const categoryBundle = slug ? getBundleByCategory(slug) : undefined;
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -184,6 +186,9 @@ const CategoryPage = () => {
               ))}
             </div>
           )}
+
+          {/* Category Bundle Section */}
+          {categoryBundle && <CategoryBundleSection bundle={categoryBundle} />}
         </div>
       </main>
       <Footer />
