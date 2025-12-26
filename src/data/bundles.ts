@@ -32,10 +32,9 @@ export const CATEGORY_BUNDLES: CategoryBundle[] = [
     descriptionEn: 'Complete skincare routine',
     descriptionAr: 'روتين كامل للعناية بالبشرة',
     productHandles: [
-      // Add your skin care product handles here
-      'product-handle-1',
-      'product-handle-2',
-      'product-handle-3',
+      'gold-diamond-hair-treatment',
+      'bio-collagen-hair-treatment',
+      'lazuli-hair-treatment',
     ],
     discountPercentage: 15,
   },
@@ -46,9 +45,9 @@ export const CATEGORY_BUNDLES: CategoryBundle[] = [
     descriptionEn: 'Premium serum bundle',
     descriptionAr: 'باقة سيروم مميزة',
     productHandles: [
-      // Add your serum product handles here
-      'serum-handle-1',
-      'serum-handle-2',
+      'argan-hair-treatment',
+      'almond-hair-treatment',
+      'emmerald-hair-treatment',
     ],
     discountPercentage: 25,
   },
@@ -59,11 +58,24 @@ export const CATEGORY_BUNDLES: CategoryBundle[] = [
     descriptionEn: 'Luxurious body care bundle',
     descriptionAr: 'باقة فاخرة للعناية بالجسم',
     productHandles: [
-      // Add your body care product handles here
-      'body-product-1',
-      'body-product-2',
+      'beyond-hair-treatment',
+      'florid-hair-treatment',
+      'black-horse-hair-treatment',
     ],
     discountPercentage: 18,
+  },
+  {
+    categorySlug: 'hair-treatment',
+    titleEn: 'Hair Treatment Set',
+    titleAr: 'مجموعة علاج الشعر',
+    descriptionEn: 'Professional hair treatment bundle',
+    descriptionAr: 'باقة علاج الشعر الاحترافية',
+    productHandles: [
+      'lipo-line-hair-treatment',
+      'lipo-blond-hair-treatment',
+      'fluence-03-in-01-hair-treatment',
+    ],
+    discountPercentage: 22,
   },
 ];
 
