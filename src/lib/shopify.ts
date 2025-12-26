@@ -194,6 +194,96 @@ const STOREFRONT_PRODUCTS_QUERY = `
   }
 `;
 
+export interface ShopifyCollection {
+  node: {
+    id: string;
+    title: string;
+    handle: string;
+    description: string;
+    image: {
+      url: string;
+      altText: string | null;
+    } | null;
+    products: {
+      edges: ShopifyProduct[];
+    };
+  };
+}
+
+const STOREFRONT_COLLECTIONS_QUERY = `
+  query GetCollections($first: Int!) {
+    collections(first: $first) {
+      edges {
+        node {
+          id
+          title
+          handle
+          description
+          image {
+            url
+            altText
+          }
+          products(first: 50) {
+            edges {
+              node {
+                id
+                title
+                description
+                handle
+                priceRange {
+                  minVariantPrice {
+                    amount
+                    currencyCode
+                  }
+                }
+                compareAtPriceRange {
+                  minVariantPrice {
+                    amount
+                    currencyCode
+                  }
+                }
+                images(first: 5) {
+                  edges {
+                    node {
+                      url
+                      altText
+                    }
+                  }
+                }
+                variants(first: 10) {
+                  edges {
+                    node {
+                      id
+                      title
+                      price {
+                        amount
+                        currencyCode
+                      }
+                      compareAtPrice {
+                        amount
+                        currencyCode
+                      }
+                      availableForSale
+                      selectedOptions {
+                        name
+                        value
+                      }
+                    }
+                  }
+                }
+                options {
+                  name
+                  values
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const STOREFRONT_PRODUCT_BY_HANDLE_QUERY = `
   query GetProductByHandle($handle: String!) {
     productByHandle(handle: $handle) {
@@ -326,6 +416,20 @@ export async function fetchShopifyProducts(first: number = 50, query?: string): 
     });
     if (!data) return [];
     return data.data.products.edges || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchShopifyCollections(first: number = 20): Promise<ShopifyCollection[]> {
+  try {
+    const validatedFirst = validateFirstParam(first);
+    
+    const data = await storefrontApiRequest(STOREFRONT_COLLECTIONS_QUERY, { 
+      first: validatedFirst
+    });
+    if (!data) return [];
+    return data.data.collections.edges || [];
   } catch {
     return [];
   }

@@ -15,9 +15,9 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <BestSellersSection />
         <ShopifyProductsSection />
         <PromoBanner />
-        <BestSellersSection />
         <CategoriesSection />
         <BundleSection />
         <TestimonialsSection />

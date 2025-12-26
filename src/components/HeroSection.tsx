@@ -23,12 +23,7 @@ const HeroSection = () => {
     setLanguage(language === 'ar' ? 'en' : 'ar');
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
+  // Autoplay disabled - slider only changes on manual interaction
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % heroImages.length);
@@ -92,6 +87,13 @@ const HeroSection = () => {
               >
                 {t('Products', 'المنتجات')}
               </a>
+              <Link 
+                to="/collections" 
+                className="font-body text-base font-medium text-foreground hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t('Collections', 'الأقسام')}
+              </Link>
               <a 
                 href="#bundles" 
                 className="font-body text-base font-medium text-foreground hover:text-primary transition-colors"

@@ -1,5 +1,6 @@
 import { Menu, X, Globe } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CartDrawer } from './CartDrawer';
 
@@ -45,6 +46,9 @@ const Header = () => {
             <a href="#products" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               {t('Products', 'المنتجات')}
             </a>
+            <Link to="/collections" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              {t('Collections', 'الأقسام')}
+            </Link>
             <a href="#bundles" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               {t('Sets', 'المجموعات')}
             </a>
@@ -80,6 +84,13 @@ const Header = () => {
               >
                 {t('Products', 'المنتجات')}
               </a>
+              <Link 
+                to="/collections" 
+                className="font-body text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {t('Collections', 'الأقسام')}
+              </Link>
               <a 
                 href="#bundles" 
                 className="font-body text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
