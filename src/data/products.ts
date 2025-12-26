@@ -176,7 +176,7 @@ export const testimonials: Testimonial[] = [
     review: "It's really beautiful, and I liked it very much, and I'll use all of your products seriously",
     reviewAr: "المنتج جميل بجد، وعجبني جدًا، وأنا ناوية أستخدم كل منتجاتكم بجد ومن غير تردد.",
     productName: "GOLD DIAMOND Hair Treatment",
-    productNameAr: "علاج الشعر جولد دايموند",
+    productNameAr: "GOLD DIAMOND Hair Treatment",
     productType: "single",
     productImage: productSerum,
     productHandle: "gold-diamond-hair-treatment",
@@ -191,7 +191,7 @@ export const testimonials: Testimonial[] = [
     reviewAr:
       "أكتر من رائع، أنا وبنتي استخدمناه وخلى شعرنا جميل جدًا، وريحتُه تحفة، وادى لمعة حلوة وترطيب واضح وبيفضل تأثيره في الشعر فترة طويلة..",
     productName: "Hair Mask Xpresso",
-    productNameAr: "ماسك الشعر اكسبريسو",
+    productNameAr: "Hair Mask Xpresso",
     productType: "single",
     productImage: productCream,
     productHandle: "hair-mask-xpresso",
@@ -206,7 +206,7 @@ export const testimonials: Testimonial[] = [
     reviewAr:
       "أنا شغلي في مجال التجميل، وكان صعب ألاقي مجموعة منتجات عناية بالشعر بالجودة دي، بجد كانت تجربة ممتعة، وهكمّل استخدم المنتج ده، وحسّيت إنه خلّى شعري يتنفس.",
     productName: "BIO COLLAGEN Hair Treatment",
-    productNameAr: "علاج الشعر بيو كولاجين",
+    productNameAr: "BIO COLLAGEN Hair Treatment",
     productType: "single",
     productImage: productCleanser,
     productHandle: "bio-collagen-hair-treatment",
