@@ -384,7 +384,7 @@ const WhatsAppWidget = () => {
       {/* Floating WhatsApp Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-50 bg-[#25D366] hover:bg-[#20BD5A] text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+        className="fixed bottom-24 md:bottom-6 left-6 z-40 bg-[#25D366] hover:bg-[#20BD5A] text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
         aria-label="WhatsApp"
       >
         <MessageCircle className="h-7 w-7" />

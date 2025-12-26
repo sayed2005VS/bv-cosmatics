@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Grid3X3, ShoppingBag, User } from 'lucide-react';
+import { Home, Grid3X3, ShoppingBag } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCartStore } from '@/stores/cartStore';
 import { Badge } from '@/components/ui/badge';
@@ -26,11 +26,6 @@ const MobileBottomNav = () => {
       label: t('Cart', 'السلة'),
       icon: ShoppingBag,
       badge: totalItems > 0 ? totalItems : undefined,
-    },
-    {
-      path: '/profile',
-      label: t('Profile', 'حسابي'),
-      icon: User,
     },
   ];
 
