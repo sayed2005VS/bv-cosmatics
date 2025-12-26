@@ -189,8 +189,8 @@ const ShopifyProductsSection = () => {
 
         <div 
           ref={scrollContainerRef}
-          className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4"
-          style={{ scrollSnapType: 'x mandatory' }}
+          className="flex gap-3 md:gap-4 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-none"
+          style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {products.map((product, index) => (
             <div 

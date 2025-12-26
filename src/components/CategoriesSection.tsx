@@ -1,10 +1,12 @@
+import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, Droplets, Sun, Moon, Heart, Leaf } from 'lucide-react';
 
 const categories = [
   {
     id: 1,
-    name: 'Serums',
+    slug: 'serums',
+    nameEn: 'Serums',
     nameAr: 'سيروم',
     icon: Droplets,
     color: 'from-blue-500/20 to-blue-600/20',
@@ -12,7 +14,8 @@ const categories = [
   },
   {
     id: 2,
-    name: 'Moisturizers',
+    slug: 'moisturizers',
+    nameEn: 'Moisturizers',
     nameAr: 'مرطبات',
     icon: Heart,
     color: 'from-pink-500/20 to-pink-600/20',
@@ -20,7 +23,8 @@ const categories = [
   },
   {
     id: 3,
-    name: 'Cleansers',
+    slug: 'cleansers',
+    nameEn: 'Cleansers',
     nameAr: 'منظفات',
     icon: Sparkles,
     color: 'from-purple-500/20 to-purple-600/20',
@@ -28,7 +32,8 @@ const categories = [
   },
   {
     id: 4,
-    name: 'Sun Care',
+    slug: 'sun-care',
+    nameEn: 'Sun Care',
     nameAr: 'واقي شمس',
     icon: Sun,
     color: 'from-amber-500/20 to-amber-600/20',
@@ -36,7 +41,8 @@ const categories = [
   },
   {
     id: 5,
-    name: 'Night Care',
+    slug: 'night-care',
+    nameEn: 'Night Care',
     nameAr: 'عناية ليلية',
     icon: Moon,
     color: 'from-indigo-500/20 to-indigo-600/20',
@@ -44,7 +50,8 @@ const categories = [
   },
   {
     id: 6,
-    name: 'Natural',
+    slug: 'natural',
+    nameEn: 'Natural',
     nameAr: 'طبيعي',
     icon: Leaf,
     color: 'from-green-500/20 to-green-600/20',
@@ -69,9 +76,10 @@ const CategoriesSection = () => {
           {categories.map((category, index) => {
             const IconComponent = category.icon;
             return (
-              <div
+              <Link
                 key={category.id}
-                className="animate-fade-up opacity-0 cursor-pointer"
+                to={`/category/${category.slug}`}
+                className="animate-fade-up opacity-0"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className={`group relative p-6 rounded-2xl bg-gradient-to-br ${category.color} border ${category.borderColor} transition-all duration-300 hover:scale-105 hover:shadow-card`}>
@@ -80,11 +88,11 @@ const CategoriesSection = () => {
                       <IconComponent className="w-7 h-7 text-foreground" />
                     </div>
                     <h3 className="font-display text-lg font-medium text-foreground">
-                      {language === 'ar' ? category.nameAr : category.name}
+                      {language === 'ar' ? category.nameAr : category.nameEn}
                     </h3>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
