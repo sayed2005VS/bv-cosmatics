@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
 import ProductsPage from "./pages/ProductsPage";
 import CollectionsPage from "./pages/CollectionsPage";
+import CategoryPage from "./pages/CategoryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/collections" element={<CollectionsPage />} />
+              <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/product/:handle" element={<ProductPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

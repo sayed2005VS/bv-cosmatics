@@ -8,22 +8,24 @@ import BundleSection from '@/components/BundleSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import Footer from '@/components/Footer';
 import WhatsAppWidget from '@/components/WhatsAppWidget';
+import MobileBottomNav from '@/components/MobileBottomNav';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Header />
       <main>
         <HeroSection />
         <BestSellersSection />
-        <ShopifyProductsSection />
         <PromoBanner />
+        <ShopifyProductsSection />
         <CategoriesSection />
         <BundleSection />
         <TestimonialsSection />
       </main>
       <Footer />
       <WhatsAppWidget />
+      <MobileBottomNav />
     </div>
   );
 };
