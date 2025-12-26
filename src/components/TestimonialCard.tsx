@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { Testimonial } from '@/data/products';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -56,10 +57,22 @@ const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
             </p>
           </div>
           
-          {/* CTA */}
-          <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground">
-            {t('Shop', 'تسوق')}
-          </button>
+          {/* CTA - Link to product page */}
+          {testimonial.productHandle ? (
+            <Link 
+              to={`/product/${testimonial.productHandle}`}
+              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
+            >
+              {t('Shop', 'تسوق')}
+            </Link>
+          ) : (
+            <Link 
+              to="/products"
+              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
+            >
+              {t('Shop', 'تسوق')}
+            </Link>
+          )}
         </div>
       </div>
     </div>

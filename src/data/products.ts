@@ -53,6 +53,7 @@ export interface Testimonial {
   productNameAr: string;
   productType: "single" | "bundle";
   productImage: string;
+  productHandle?: string; // Shopify product handle for linking
 }
 
 export const categories = [
@@ -172,12 +173,13 @@ export const testimonials: Testimonial[] = [
     customerName: "Sarah Ahmed.",
     customerImage: customer1,
     rating: 5,
-    review: "It’s really beautiful, and I liked it very much, and I’ll use all of your products seriously",
+    review: "It's really beautiful, and I liked it very much, and I'll use all of your products seriously",
     reviewAr: "المنتج جميل بجد، وعجبني جدًا، وأنا ناوية أستخدم كل منتجاتكم بجد ومن غير تردد.",
-    productName: "Vitamin C Brightening Serum",
-    productNameAr: "سيروم فيتامين سي للتفتيح",
+    productName: "GOLD DIAMOND Hair Treatment",
+    productNameAr: "علاج الشعر جولد دايموند",
     productType: "single",
     productImage: productSerum,
+    productHandle: "gold-diamond-hair-treatment",
   },
   {
     id: "2",
@@ -188,10 +190,11 @@ export const testimonials: Testimonial[] = [
       "More than wonderful, my daughter and I used it and made our hair wonderful and its smell was great, it gave a beautiful shine and clear moisturising, long-lasting in the hair",
     reviewAr:
       "أكتر من رائع، أنا وبنتي استخدمناه وخلى شعرنا جميل جدًا، وريحتُه تحفة، وادى لمعة حلوة وترطيب واضح وبيفضل تأثيره في الشعر فترة طويلة..",
-    productName: "Complete Glow Routine",
-    productNameAr: "روتين التوهج الكامل",
-    productType: "bundle",
+    productName: "Hair Mask Xpresso",
+    productNameAr: "ماسك الشعر اكسبريسو",
+    productType: "single",
     productImage: productCream,
+    productHandle: "hair-mask-xpresso",
   },
   {
     id: "3",
@@ -202,10 +205,11 @@ export const testimonials: Testimonial[] = [
       "I specialise in the world of beauty and it was difficult to have a group of hair care products like this product, it was really interesting when used, I will continue to use this product, it made my hair breathe",
     reviewAr:
       "أنا شغلي في مجال التجميل، وكان صعب ألاقي مجموعة منتجات عناية بالشعر بالجودة دي، بجد كانت تجربة ممتعة، وهكمّل استخدم المنتج ده، وحسّيت إنه خلّى شعري يتنفس.",
-    productName: "Gentle Foam Cleanser",
-    productNameAr: "غسول رغوي لطيف",
+    productName: "BIO COLLAGEN Hair Treatment",
+    productNameAr: "علاج الشعر بيو كولاجين",
     productType: "single",
     productImage: productCleanser,
+    productHandle: "bio-collagen-hair-treatment",
   },
 ];
 
