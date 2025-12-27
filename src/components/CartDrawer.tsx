@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingBag, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
+import { ShoppingBag, Minus, Plus, Trash2, MessageCircle } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
@@ -13,13 +13,12 @@ import {
 
 export const CartDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { 
     items, 
-    isLoading, 
     updateQuantity, 
     removeItem, 
-    createCheckout,
+    createWhatsAppCheckout,
     getTotalItems,
     getTotalPrice,
   } = useCartStore();
@@ -27,17 +26,11 @@ export const CartDrawer = () => {
   const totalItems = getTotalItems();
   const totalPrice = getTotalPrice();
 
-  const handleCheckout = async () => {
-    try {
-      const checkoutUrl = await createCheckout();
-      if (checkoutUrl) {
-        // Using noopener,noreferrer to prevent tabnabbing attacks
-        const newWindow = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-        if (newWindow) newWindow.opener = null;
-        setIsOpen(false);
-      }
-    } catch {
-      // Silent fail - user sees loading state revert
+  const handleCheckout = () => {
+    const whatsappUrl = createWhatsAppCheckout();
+    if (whatsappUrl) {
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      setIsOpen(false);
     }
   };
 
@@ -82,24 +75,26 @@ export const CartDrawer = () => {
                   {items.map((item) => (
                     <div key={item.variantId} className="flex gap-4 p-3 bg-secondary/50 rounded-xl">
                       <div className="w-16 h-16 bg-background rounded-lg overflow-hidden flex-shrink-0">
-                        {item.product.node.images?.edges?.[0]?.node && (
+                        {item.product.images?.[0] && (
                           <img
-                            src={item.product.node.images.edges[0].node.url}
-                            alt={item.product.node.title}
+                            src={item.product.images[0]}
+                            alt={language === 'ar' ? item.product.titleAr : item.product.title}
                             className="w-full h-full object-cover"
                           />
                         )}
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{item.product.node.title}</h4>
-                        {item.variantTitle !== 'Default Title' && (
+                        <h4 className="font-medium text-sm truncate">
+                          {language === 'ar' ? item.product.titleAr : item.product.title}
+                        </h4>
+                        {item.variantTitle !== 'Default' && (
                           <p className="text-xs text-muted-foreground">
-                            {item.selectedOptions.map(option => option.value).join(' • ')}
+                            {item.variantTitle}
                           </p>
                         )}
                         <p className="font-semibold text-sm mt-1">
-                          {item.price.currencyCode} {parseFloat(item.price.amount).toFixed(2)}
+                          {item.price} {t('EGP', 'ج.م')}
                         </p>
                       </div>
                       
@@ -137,26 +132,17 @@ export const CartDrawer = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">{t('Total', 'المجموع')}</span>
                   <span className="text-xl font-bold font-display">
-                    {items[0]?.price.currencyCode || 'USD'} {totalPrice.toFixed(2)}
+                    {totalPrice} {t('EGP', 'ج.م')}
                   </span>
                 </div>
                 
                 <button 
                   onClick={handleCheckout}
                   className="btn-gold w-full flex items-center justify-center gap-2"
-                  disabled={items.length === 0 || isLoading}
+                  disabled={items.length === 0}
                 >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      {t('Creating Checkout...', 'جاري إنشاء الطلب...')}
-                    </>
-                  ) : (
-                    <>
-                      <ExternalLink className="w-4 h-4" />
-                      {t('Checkout', 'إتمام الشراء')}
-                    </>
-                  )}
+                  <MessageCircle className="w-4 h-4" />
+                  {t('Order via WhatsApp', 'اطلب عبر واتساب')}
                 </button>
               </div>
             </>

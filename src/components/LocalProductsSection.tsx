@@ -1,23 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
+import { fetchProducts, LocalProduct } from '@/lib/products';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
-const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
-  const { t } = useLanguage();
+const LocalProductCard = ({ product }: { product: LocalProduct }) => {
+  const { t, language } = useLanguage();
   const addItem = useCartStore(state => state.addItem);
-  const node = product.node;
-  const firstVariant = node.variants.edges[0]?.node;
-  const image = node.images.edges[0]?.node;
-
-  const currentPrice = parseFloat(node.priceRange.minVariantPrice.amount);
-  const compareAtPrice = node.compareAtPriceRange?.minVariantPrice?.amount 
-    ? parseFloat(node.compareAtPriceRange.minVariantPrice.amount) 
-    : null;
+  const firstVariant = product.variants[0];
 
   const handleAddToCart = () => {
     if (!firstVariant) return;
@@ -28,23 +21,24 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
       variantTitle: firstVariant.title,
       price: firstVariant.price,
       quantity: 1,
-      selectedOptions: firstVariant.selectedOptions || [],
     });
 
     toast.success(t('Added to cart', 'تمت الإضافة للسلة'), {
-      description: node.title,
+      description: language === 'ar' ? product.titleAr : product.title,
       position: 'top-center',
     });
   };
 
+  const displayTitle = language === 'ar' ? product.titleAr : product.title;
+
   return (
     <div className="card-product group relative">
-      <Link to={`/product/${node.handle}`} className="block">
+      <Link to={`/product/${product.handle}`} className="block">
         <div className="relative aspect-[4/5] bg-secondary overflow-hidden">
-          {image && (
+          {product.images[0] && (
             <img 
-              src={image.url} 
-              alt={image.altText || node.title}
+              src={product.images[0]} 
+              alt={displayTitle}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )}
@@ -52,27 +46,27 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
       </Link>
 
       <div className="p-3">
-        <Link to={`/product/${node.handle}`}>
+        <Link to={`/product/${product.handle}`}>
           <h3 className="font-display text-sm font-medium text-foreground mb-1 leading-tight hover:text-primary transition-colors line-clamp-1">
-            {node.title}
+            {displayTitle}
           </h3>
         </Link>
         
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-baseline gap-1">
             <span className="font-body text-sm font-semibold text-foreground">
-              {currentPrice.toFixed(0)} {t('EGP', 'ج.م')}
+              {product.price} {t('EGP', 'ج.م')}
             </span>
-            {compareAtPrice && compareAtPrice > currentPrice && (
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
               <span className="text-xs text-muted-foreground line-through">
-                {compareAtPrice.toFixed(0)}
+                {product.compareAtPrice}
               </span>
             )}
           </div>
           
           <button 
             onClick={handleAddToCart}
-            disabled={!firstVariant?.availableForSale}
+            disabled={!product.inStock}
             className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-gold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus size={16} />
@@ -83,8 +77,8 @@ const ShopifyProductCard = ({ product }: { product: ShopifyProduct }) => {
   );
 };
 
-const ShopifyProductsSection = () => {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+const LocalProductsSection = () => {
+  const [products, setProducts] = useState<LocalProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { t, isRTL } = useLanguage();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -92,7 +86,7 @@ const ShopifyProductsSection = () => {
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const fetchedProducts = await fetchShopifyProducts(10);
+      const fetchedProducts = await fetchProducts(10);
       setProducts(fetchedProducts);
       setLoading(false);
     };
@@ -194,14 +188,14 @@ const ShopifyProductsSection = () => {
         >
           {products.map((product, index) => (
             <div 
-              key={product.node.id}
+              key={product.id}
               className="flex-shrink-0 w-[calc(50%-6px)] sm:w-[calc(33.333%-8px)] md:w-[calc(25%-9px)] lg:w-[calc(20%-10px)] animate-fade-up"
               style={{ 
                 animationDelay: `${index * 50}ms`,
                 scrollSnapAlign: 'start'
               }}
             >
-              <ShopifyProductCard product={product} />
+              <LocalProductCard product={product} />
             </div>
           ))}
         </div>
@@ -210,4 +204,4 @@ const ShopifyProductsSection = () => {
   );
 };
 
-export default ShopifyProductsSection;
+export default LocalProductsSection;
