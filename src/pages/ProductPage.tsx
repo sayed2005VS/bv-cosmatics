@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Minus, Plus, ShoppingBag, Loader2, Heart, Zap } from 'lucide-react';
-import { fetchProductByHandle, ShopifyProduct } from '@/lib/shopify';
+import { Minus, Plus, ShoppingBag, Loader2, Heart, MessageCircle } from 'lucide-react';
+import { fetchProductByHandle, LocalProduct } from '@/lib/products';
 import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,7 +12,6 @@ import ProductImageGallery from '@/components/product/ProductImageGallery';
 import TrustBadges from '@/components/product/TrustBadges';
 import ProductTabs from '@/components/product/ProductTabs';
 import RelatedProducts from '@/components/product/RelatedProducts';
-import ProductReviews from '@/components/product/ProductReviews';
 import SocialShare from '@/components/product/SocialShare';
 import StickyAddToCart from '@/components/product/StickyAddToCart';
 import StockIndicator from '@/components/product/StockIndicator';
@@ -28,14 +27,15 @@ import {
 const ProductPage = () => {
   const { handle } = useParams<{ handle: string }>();
   const { t, language } = useLanguage();
-  const [product, setProduct] = useState<ShopifyProduct['node'] | null>(null);
+  const [product, setProduct] = useState<LocalProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [showStickyBar, setShowStickyBar] = useState(false);
   const addToCartRef = useRef<HTMLButtonElement>(null);
   
   const addItem = useCartStore((state) => state.addItem);
+  const createWhatsAppCheckout = useCartStore((state) => state.createWhatsAppCheckout);
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
 
   useEffect(() => {
@@ -44,8 +44,8 @@ const ProductPage = () => {
       setLoading(true);
       const productData = await fetchProductByHandle(handle);
       setProduct(productData);
-      if (productData?.variants?.edges?.[0]) {
-        setSelectedVariant(productData.variants.edges[0].node.id);
+      if (productData?.variants?.[0]) {
+        setSelectedVariantId(productData.variants[0].id);
       }
       setLoading(false);
     };
@@ -65,39 +65,34 @@ const ProductPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const selectedVariant = product?.variants.find(v => v.id === selectedVariantId);
+
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return;
 
-    const variant = product.variants.edges.find(v => v.node.id === selectedVariant)?.node;
-    if (!variant) return;
-
     addItem({
-      product: { node: product },
-      variantId: variant.id,
-      variantTitle: variant.title,
-      price: variant.price,
+      product,
+      variantId: selectedVariant.id,
+      variantTitle: selectedVariant.title,
+      price: selectedVariant.price,
       quantity,
-      selectedOptions: variant.selectedOptions,
     });
 
     toast.success(t('Added to cart', 'تمت الإضافة للسلة'), {
-      description: `${product.title} x ${quantity}`,
+      description: `${language === 'ar' ? product.titleAr : product.title} x ${quantity}`,
     });
   };
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = () => {
     handleAddToCart();
-    const checkoutUrl = await useCartStore.getState().createCheckout();
-    if (checkoutUrl) {
-      window.open(checkoutUrl, '_blank');
+    const whatsappUrl = createWhatsAppCheckout();
+    if (whatsappUrl) {
+      window.open(whatsappUrl, '_blank');
     }
   };
 
   const handleWishlistToggle = () => {
     if (!product) return;
-
-    const image = product.images?.edges?.[0]?.node?.url || '';
-    const price = product.priceRange.minVariantPrice;
 
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
@@ -106,10 +101,10 @@ const ProductPage = () => {
       addToWishlist({
         productId: product.id,
         productHandle: product.handle,
-        title: product.title,
-        imageUrl: image,
-        price: price.amount,
-        currencyCode: price.currencyCode,
+        title: language === 'ar' ? product.titleAr : product.title,
+        imageUrl: product.images[0] || '',
+        price: String(product.price),
+        currencyCode: product.currency,
       });
       toast.success(t('Added to wishlist', 'تمت الإضافة للمفضلة'));
     }
@@ -142,15 +137,18 @@ const ProductPage = () => {
     );
   }
 
-  const images = product.images?.edges || [];
-  const currentVariant = product.variants.edges.find(v => v.node.id === selectedVariant)?.node;
-  const price = currentVariant?.price || product.priceRange.minVariantPrice;
-  const compareAtPrice = currentVariant?.compareAtPrice;
-  const hasDiscount = compareAtPrice && parseFloat(compareAtPrice.amount) > parseFloat(price.amount);
-  const discountPercentage = hasDiscount
-    ? Math.round((1 - parseFloat(price.amount) / parseFloat(compareAtPrice.amount)) * 100)
-    : 0;
+  const displayTitle = language === 'ar' ? product.titleAr : product.title;
+  const displayDescription = language === 'ar' ? product.descriptionAr : product.description;
+  const price = selectedVariant?.price || product.price;
+  const compareAtPrice = selectedVariant?.compareAtPrice || product.compareAtPrice;
+  const hasDiscount = compareAtPrice && compareAtPrice > price;
+  const discountPercentage = hasDiscount ? Math.round((1 - price / compareAtPrice) * 100) : 0;
   const productUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  // Convert images for gallery
+  const galleryImages = product.images.map((url, index) => ({
+    node: { url, altText: `${displayTitle} - ${index + 1}` }
+  }));
 
   return (
     <div className="min-h-screen bg-background" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -168,39 +166,39 @@ const ProductPage = () => {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link to="/">{t('Products', 'المنتجات')}</Link>
+                  <Link to="/products">{t('Products', 'المنتجات')}</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{product.title}</BreadcrumbPage>
+                <BreadcrumbPage>{displayTitle}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
 
           <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
             {/* Images */}
-            <ProductImageGallery images={images} productTitle={product.title} />
+            <ProductImageGallery images={galleryImages} productTitle={displayTitle} />
 
             {/* Product Info */}
             <div className="space-y-6">
               {/* Title & Share */}
               <div className="flex items-start justify-between gap-4">
                 <h1 className="font-display text-3xl md:text-4xl text-foreground animate-fade-in">
-                  {product.title}
+                  {displayTitle}
                 </h1>
-                <SocialShare productTitle={product.title} productUrl={productUrl} />
+                <SocialShare productTitle={displayTitle} productUrl={productUrl} />
               </div>
 
               {/* Price */}
               <div className="flex items-center gap-3 animate-fade-in delay-100">
                 <p className="text-2xl font-semibold text-primary">
-                  {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
+                  {product.currency} {price}
                 </p>
                 {hasDiscount && (
                   <>
                     <p className="text-lg text-muted-foreground line-through">
-                      {compareAtPrice.currencyCode} {parseFloat(compareAtPrice.amount).toFixed(2)}
+                      {product.currency} {compareAtPrice}
                     </p>
                     <span className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-full">
                       -{discountPercentage}%
@@ -210,51 +208,44 @@ const ProductPage = () => {
               </div>
 
               {/* Stock Indicator */}
-              <StockIndicator isAvailable={currentVariant?.availableForSale ?? false} />
+              <StockIndicator isAvailable={selectedVariant?.availableForSale ?? product.inStock} />
 
               {/* Description */}
-              {product.description && (
+              {displayDescription && (
                 <p className="text-muted-foreground leading-relaxed animate-fade-in delay-200">
-                  {product.description}
+                  {displayDescription}
                 </p>
               )}
 
               {/* Variants */}
-              {product.options && product.options.length > 0 && product.options[0].values.length > 1 && (
+              {product.variants.length > 1 && (
                 <div className="space-y-4 animate-fade-in delay-300">
-                  {product.options.map((option) => (
-                    <div key={option.name}>
-                      <label className="block text-sm font-medium mb-2">
-                        {option.name}
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        {option.values.map((value) => {
-                          const matchingVariant = product.variants.edges.find(v =>
-                            v.node.selectedOptions.some(o => o.name === option.name && o.value === value)
-                          );
-                          const isSelected = matchingVariant?.node.id === selectedVariant;
-                          const isAvailable = matchingVariant?.node.availableForSale;
+                  <label className="block text-sm font-medium mb-2">
+                    {t('Size', 'الحجم')}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {product.variants.map((variant) => {
+                      const isSelected = variant.id === selectedVariantId;
+                      const isAvailable = variant.availableForSale;
 
-                          return (
-                            <button
-                              key={value}
-                              onClick={() => matchingVariant && setSelectedVariant(matchingVariant.node.id)}
-                              disabled={!isAvailable}
-                              className={`px-4 py-2 rounded-lg border transition-all duration-200 ${
-                                isSelected
-                                  ? 'border-primary bg-primary text-primary-foreground scale-105'
-                                  : isAvailable
-                                    ? 'border-border hover:border-primary hover:scale-105'
-                                    : 'border-border/50 text-muted-foreground/50 cursor-not-allowed line-through'
-                              }`}
-                            >
-                              {value}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
+                      return (
+                        <button
+                          key={variant.id}
+                          onClick={() => setSelectedVariantId(variant.id)}
+                          disabled={!isAvailable}
+                          className={`px-4 py-2 rounded-lg border transition-all duration-200 ${
+                            isSelected
+                              ? 'border-primary bg-primary text-primary-foreground scale-105'
+                              : isAvailable
+                                ? 'border-border hover:border-primary hover:scale-105'
+                                : 'border-border/50 text-muted-foreground/50 cursor-not-allowed line-through'
+                          }`}
+                        >
+                          {variant.title}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
@@ -285,21 +276,21 @@ const ProductPage = () => {
                 <button
                   ref={addToCartRef}
                   onClick={handleAddToCart}
-                  disabled={!currentVariant?.availableForSale}
+                  disabled={!selectedVariant?.availableForSale}
                   className="btn-gold flex-1 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ShoppingBag size={20} />
-                  {currentVariant?.availableForSale
+                  {selectedVariant?.availableForSale
                     ? t('Add to Cart', 'أضف للسلة')
                     : t('Out of Stock', 'نفذ المخزون')}
                 </button>
 
                 <button
                   onClick={handleBuyNow}
-                  disabled={!currentVariant?.availableForSale}
+                  disabled={!selectedVariant?.availableForSale}
                   className="flex-1 flex items-center justify-center gap-2 bg-foreground text-background px-8 py-3 rounded-full font-medium transition-all duration-300 hover:bg-foreground/90 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Zap size={20} />
+                  <MessageCircle size={20} />
                   {t('Buy Now', 'اشتري الآن')}
                 </button>
 
@@ -322,12 +313,7 @@ const ProductPage = () => {
 
           {/* Product Tabs */}
           <div className="mt-12 animate-fade-in">
-            <ProductTabs description={product.description} metafields={product.metafields} />
-          </div>
-
-          {/* Product Reviews */}
-          <div className="animate-fade-in">
-            <ProductReviews productId={product.id} productTitle={product.title} />
+            <ProductTabs description={displayDescription} />
           </div>
 
           {/* Related Products */}
@@ -340,13 +326,13 @@ const ProductPage = () => {
       {/* Sticky Add to Cart */}
       <StickyAddToCart
         visible={showStickyBar}
-        productTitle={product.title}
-        price={price.amount}
-        currencyCode={price.currencyCode}
+        productTitle={displayTitle}
+        price={String(price)}
+        currencyCode={product.currency}
         quantity={quantity}
         onQuantityChange={setQuantity}
         onAddToCart={handleAddToCart}
-        isAvailable={currentVariant?.availableForSale ?? false}
+        isAvailable={selectedVariant?.availableForSale ?? product.inStock}
       />
       
       <Footer />
