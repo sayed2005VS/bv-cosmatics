@@ -1,17 +1,26 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { LocalProduct } from '@/lib/products';
+import { ShopifyProduct, createStorefrontCheckout } from '@/lib/shopify';
 
 export interface CartItem {
-  product: LocalProduct;
+  product: ShopifyProduct;
   variantId: string;
   variantTitle: string;
-  price: number;
+  price: {
+    amount: string;
+    currencyCode: string;
+  };
   quantity: number;
+  selectedOptions: Array<{
+    name: string;
+    value: string;
+  }>;
 }
 
 interface CartStore {
   items: CartItem[];
+  cartId: string | null;
+  checkoutUrl: string | null;
   isLoading: boolean;
   
   // Actions
@@ -19,19 +28,20 @@ interface CartStore {
   updateQuantity: (variantId: string, quantity: number) => void;
   removeItem: (variantId: string) => void;
   clearCart: () => void;
+  setCartId: (cartId: string) => void;
+  setCheckoutUrl: (url: string) => void;
   setLoading: (loading: boolean) => void;
-  createWhatsAppCheckout: () => string;
+  createCheckout: () => Promise<string | null>;
   getTotalItems: () => number;
   getTotalPrice: () => number;
 }
-
-// WhatsApp number for checkout
-const WHATSAPP_NUMBER = '201000000000'; // Replace with actual number
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      cartId: null,
+      checkoutUrl: null,
       isLoading: false,
 
       addItem: (item) => {
@@ -71,30 +81,32 @@ export const useCartStore = create<CartStore>()(
       },
 
       clearCart: () => {
-        set({ items: [] });
+        set({ items: [], cartId: null, checkoutUrl: null });
       },
 
+      setCartId: (cartId) => set({ cartId }),
+      setCheckoutUrl: (checkoutUrl) => set({ checkoutUrl }),
       setLoading: (isLoading) => set({ isLoading }),
 
-      createWhatsAppCheckout: () => {
-        const { items, getTotalPrice } = get();
-        if (items.length === 0) return '';
+      createCheckout: async () => {
+        const { items, setLoading, setCheckoutUrl } = get();
+        if (items.length === 0) return null;
 
-        // Build WhatsApp message
-        const productLines = items.map(item => 
-          `• ${item.product.title} (${item.variantTitle}) x${item.quantity} - ${item.price * item.quantity} EGP`
-        ).join('\n');
-
-        const total = getTotalPrice();
-        
-        const message = encodeURIComponent(
-          `🛒 *طلب جديد*\n\n` +
-          `${productLines}\n\n` +
-          `💰 *المجموع: ${total} EGP*\n\n` +
-          `الرجاء تأكيد الطلب وإرسال تفاصيل الشحن.`
-        );
-
-        return `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+        setLoading(true);
+        try {
+          const cartItems = items.map(item => ({
+            variantId: item.variantId,
+            quantity: item.quantity,
+          }));
+          const checkoutUrl = await createStorefrontCheckout(cartItems);
+          setCheckoutUrl(checkoutUrl);
+          return checkoutUrl;
+        } catch (error) {
+          console.error('Failed to create checkout:', error);
+          return null;
+        } finally {
+          setLoading(false);
+        }
       },
 
       getTotalItems: () => {
@@ -102,7 +114,7 @@ export const useCartStore = create<CartStore>()(
       },
 
       getTotalPrice: () => {
-        return get().items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        return get().items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
       },
     }),
     {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCartStore } from '@/stores/cartStore';
-import { getProductsByHandles, LocalProduct } from '@/lib/products';
+import { storefrontApiRequest, ShopifyProduct } from '@/lib/shopify';
 import { toast } from 'sonner';
 import { Loader2, Plus, Percent } from 'lucide-react';
 import { CategoryBundle, calculateBundlePrice } from '@/data/bundles';
@@ -11,25 +11,86 @@ interface CategoryBundleSectionProps {
   bundle: CategoryBundle;
 }
 
+// Dynamic GraphQL query builder for bundle products
+const buildBundleQuery = (handles: string[]) => {
+  const productFields = `
+    id
+    title
+    description
+    handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    compareAtPriceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    images(first: 1) {
+      edges {
+        node {
+          url
+          altText
+        }
+      }
+    }
+    variants(first: 1) {
+      edges {
+        node {
+          id
+          title
+          price {
+            amount
+            currencyCode
+          }
+          compareAtPrice {
+            amount
+            currencyCode
+          }
+          availableForSale
+          selectedOptions {
+            name
+            value
+          }
+        }
+      }
+    }
+  `;
+
+  const queryParts = handles.map((_, index) => 
+    `product${index + 1}: productByHandle(handle: $handle${index + 1}) { ${productFields} }`
+  ).join('\n');
+
+  const variables = handles.map((_, index) => `$handle${index + 1}: String!`).join(', ');
+
+  return `query GetBundleProducts(${variables}) { ${queryParts} }`;
+};
+
 // Bundle Product Card Component
 const BundleProductCard = ({ 
   product, 
   onAddToCart 
 }: { 
-  product: LocalProduct; 
-  onAddToCart: (product: LocalProduct) => void;
+  product: ShopifyProduct; 
+  onAddToCart: (product: ShopifyProduct) => void;
 }) => {
-  const { t, language } = useLanguage();
-  const displayTitle = language === 'ar' ? product.titleAr : product.title;
+  const { t } = useLanguage();
+  const node = product.node;
+  const image = node.images.edges[0]?.node;
+  const currentPrice = parseFloat(node.priceRange.minVariantPrice.amount);
 
   return (
     <div className="card-product group relative flex-shrink-0 w-36 md:w-auto">
-      <Link to={`/product/${product.handle}`} className="block">
+      <Link to={`/product/${node.handle}`} className="block">
         <div className="relative aspect-[4/5] bg-secondary overflow-hidden rounded-t-lg">
-          {product.images[0] && (
+          {image && (
             <img 
-              src={product.images[0]} 
-              alt={displayTitle}
+              src={image.url} 
+              alt={image.altText || node.title}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )}
@@ -37,15 +98,15 @@ const BundleProductCard = ({
       </Link>
 
       <div className="p-2 md:p-3 bg-background rounded-b-lg">
-        <Link to={`/product/${product.handle}`}>
+        <Link to={`/product/${node.handle}`}>
           <h3 className="font-display text-xs font-medium text-foreground mb-1 leading-tight hover:text-primary transition-colors line-clamp-2">
-            {displayTitle}
+            {node.title}
           </h3>
         </Link>
         
         <div className="flex items-center justify-between mt-2">
           <span className="font-body text-xs font-semibold text-foreground">
-            {product.price} {t('EGP', 'ج.م')}
+            {currentPrice.toFixed(0)} {t('EGP', 'ج.م')}
           </span>
           
           <button 
@@ -66,7 +127,7 @@ const BundleProductCard = ({
 const CategoryBundleSection = ({ bundle }: CategoryBundleSectionProps) => {
   const { language, t } = useLanguage();
   const addItem = useCartStore(state => state.addItem);
-  const [products, setProducts] = useState<LocalProduct[]>([]);
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,16 +138,36 @@ const CategoryBundleSection = ({ bundle }: CategoryBundleSectionProps) => {
       }
 
       setLoading(true);
-      const fetchedProducts = await getProductsByHandles(bundle.productHandles);
-      setProducts(fetchedProducts);
+      try {
+        const query = buildBundleQuery(bundle.productHandles);
+        const variables: Record<string, string> = {};
+        bundle.productHandles.forEach((handle, index) => {
+          variables[`handle${index + 1}`] = handle;
+        });
+
+        const data = await storefrontApiRequest(query, variables);
+        
+        if (data?.data) {
+          const fetchedProducts: ShopifyProduct[] = [];
+          bundle.productHandles.forEach((_, index) => {
+            const product = data.data[`product${index + 1}`];
+            if (product) {
+              fetchedProducts.push({ node: product });
+            }
+          });
+          setProducts(fetchedProducts);
+        }
+      } catch (error) {
+        console.error('Failed to load bundle products:', error);
+      }
       setLoading(false);
     };
 
     loadBundleProducts();
   }, [bundle.productHandles]);
 
-  const handleAddSingleProduct = (product: LocalProduct) => {
-    const firstVariant = product.variants[0];
+  const handleAddSingleProduct = (product: ShopifyProduct) => {
+    const firstVariant = product.node.variants.edges[0]?.node;
     if (firstVariant) {
       addItem({
         product,
@@ -94,10 +175,11 @@ const CategoryBundleSection = ({ bundle }: CategoryBundleSectionProps) => {
         variantTitle: firstVariant.title,
         price: firstVariant.price,
         quantity: 1,
+        selectedOptions: firstVariant.selectedOptions || [],
       });
       
       toast.success(t('Added to cart', 'تمت الإضافة للسلة'), {
-        description: language === 'ar' ? product.titleAr : product.title,
+        description: product.node.title,
         position: 'top-center',
       });
     }
@@ -107,7 +189,7 @@ const CategoryBundleSection = ({ bundle }: CategoryBundleSectionProps) => {
     if (products.length === 0) return;
 
     products.forEach(product => {
-      const firstVariant = product.variants[0];
+      const firstVariant = product.node.variants.edges[0]?.node;
       if (firstVariant) {
         addItem({
           product,
@@ -115,6 +197,7 @@ const CategoryBundleSection = ({ bundle }: CategoryBundleSectionProps) => {
           variantTitle: firstVariant.title,
           price: firstVariant.price,
           quantity: 1,
+          selectedOptions: firstVariant.selectedOptions || [],
         });
       }
     });
@@ -126,7 +209,10 @@ const CategoryBundleSection = ({ bundle }: CategoryBundleSectionProps) => {
   };
 
   // Calculate prices
-  const originalTotal = products.reduce((sum, p) => sum + p.price, 0);
+  const originalTotal = products.reduce(
+    (sum, p) => sum + parseFloat(p.node.priceRange.minVariantPrice.amount),
+    0
+  );
   const { bundlePrice, savings } = calculateBundlePrice(originalTotal, bundle.discountPercentage);
 
   // Don't render if no products loaded
@@ -167,7 +253,7 @@ const CategoryBundleSection = ({ bundle }: CategoryBundleSectionProps) => {
               <div className="flex gap-3">
                 {products.map((product) => (
                   <BundleProductCard 
-                    key={product.id} 
+                    key={product.node.id} 
                     product={product} 
                     onAddToCart={handleAddSingleProduct}
                   />
@@ -179,7 +265,7 @@ const CategoryBundleSection = ({ bundle }: CategoryBundleSectionProps) => {
             <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.map((product) => (
                 <BundleProductCard 
-                  key={product.id} 
+                  key={product.node.id} 
                   product={product} 
                   onAddToCart={handleAddSingleProduct}
                 />

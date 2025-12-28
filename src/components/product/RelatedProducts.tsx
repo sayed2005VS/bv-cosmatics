@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag } from 'lucide-react';
-import { fetchProducts, LocalProduct } from '@/lib/products';
+import { fetchShopifyProducts, ShopifyProduct } from '@/lib/shopify';
 import { useCartStore } from '@/stores/cartStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
@@ -12,24 +12,24 @@ interface RelatedProductsProps {
 
 const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
   const { t, language } = useLanguage();
-  const [products, setProducts] = useState<LocalProduct[]>([]);
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const allProducts = await fetchProducts(8);
+      const allProducts = await fetchShopifyProducts(8);
       // Filter out the current product
-      const filtered = allProducts.filter(p => p.id !== currentProductId);
+      const filtered = allProducts.filter(p => p.node.id !== currentProductId);
       setProducts(filtered.slice(0, 4));
       setLoading(false);
     };
     loadProducts();
   }, [currentProductId]);
 
-  const handleAddToCart = (product: LocalProduct) => {
-    const variant = product.variants[0];
+  const handleAddToCart = (product: ShopifyProduct) => {
+    const variant = product.node.variants.edges[0]?.node;
     if (!variant) return;
 
     addItem({
@@ -38,10 +38,11 @@ const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
       variantTitle: variant.title,
       price: variant.price,
       quantity: 1,
+      selectedOptions: variant.selectedOptions,
     });
 
     toast.success(t('Added to cart', 'تمت الإضافة للسلة'), {
-      description: language === 'ar' ? product.titleAr : product.title,
+      description: product.node.title,
     });
   };
 
@@ -73,16 +74,17 @@ const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {products.map((product) => {
-          const displayTitle = language === 'ar' ? product.titleAr : product.title;
+          const image = product.node.images.edges[0]?.node;
+          const price = product.node.priceRange.minVariantPrice;
 
           return (
-            <div key={product.id} className="group">
-              <Link to={`/product/${product.handle}`}>
+            <div key={product.node.id} className="group">
+              <Link to={`/product/${product.node.handle}`}>
                 <div className="aspect-square bg-secondary/50 rounded-xl overflow-hidden mb-3 relative">
-                  {product.images[0] ? (
+                  {image ? (
                     <img
-                      src={product.images[0]}
-                      alt={displayTitle}
+                      src={image.url}
+                      alt={image.altText || product.node.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
@@ -92,10 +94,10 @@ const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
                   )}
                 </div>
                 <h3 className="font-medium text-sm text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors">
-                  {displayTitle}
+                  {product.node.title}
                 </h3>
                 <p className="text-primary font-semibold text-sm">
-                  {product.currency} {product.price}
+                  {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
                 </p>
               </Link>
               <button
