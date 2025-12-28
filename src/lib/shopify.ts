@@ -120,6 +120,13 @@ export async function storefrontApiRequest(query: string, variables: Record<stri
     return null;
   }
 
+  if (response.status === 401) {
+    toast.error("Shopify: Storefront API not enabled", {
+      description: "Please enable Storefront API access in your Shopify admin settings under Apps > Develop apps.",
+    });
+    return null;
+  }
+
   if (!response.ok) {
     throw new Error('Unable to connect to store');
   }
@@ -127,6 +134,16 @@ export async function storefrontApiRequest(query: string, variables: Record<stri
   const data = await response.json();
   
   if (data.errors) {
+    // Check for unauthorized errors in the response
+    const hasUnauthorized = data.errors.some((e: { extensions?: { code?: string } }) => 
+      e.extensions?.code === 'UNAUTHORIZED'
+    );
+    if (hasUnauthorized) {
+      toast.error("Shopify: Access denied", {
+        description: "Storefront API access token may be invalid. Please check your Shopify app settings.",
+      });
+      return null;
+    }
     throw new Error('Unable to load store data');
   }
 
